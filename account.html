@@ -568,13 +568,16 @@ async function handleRegister() {
     return;
   }
 
-  /* If email confirmation is required */
-  if (data.user && !data.session) {
-    const s = document.getElementById('register-success');
-    s.textContent = 'Check your email to confirm your account!';
-    s.style.display = 'block';
-  } else {
+  if (data.session) {
+    /* email confirmation OFF - logged in immediately */
     showToast('Account created! Welcome to Skindex ✨');
+    await loadProfile(data.session.user);
+    showProfileView();
+  } else if (data.user && !data.session) {
+    /* email confirmation ON - need to verify */
+    const s = document.getElementById('register-success');
+    s.textContent = '✉️ Check your email to confirm your account, then come back to sign in!';
+    s.style.display = 'block';
   }
 }
 
@@ -613,25 +616,55 @@ async function showForgot() {
 
 async function loadProfile(user) {
   const meta = user.user_metadata || {};
-  const name = meta.full_name || meta.name || (meta.first_name ? meta.first_name + ' ' + (meta.last_name||'') : 'Member');
   const email = user.email;
-  const initials = name.split(' ').map(n => n[0]).join('').toUpperCase().slice(0,2);
+
+  /* ── Try profiles table first, fallback to user_metadata ── */
+  let fname = '', lname = '', phone = '', profileEmail = '';
+  try {
+    const { data: profile, error: profileErr } = await sb
+      .from('profiles')
+      .select('first_name, last_name, phone, email')
+      .eq('id', user.id)
+      .maybeSingle();
+
+    console.log('Profile from DB:', profile, profileErr);
+
+    if (profile) {
+      fname        = profile.first_name || meta.first_name || '';
+      lname        = profile.last_name  || meta.last_name  || '';
+      phone        = profile.phone      || meta.phone      || '';
+      profileEmail = profile.email      || user.email      || '';
+    } else {
+      /* profile row ยังไม่มี — สร้างให้เลย */
+      fname        = meta.first_name || '';
+      lname        = meta.last_name  || '';
+      profileEmail = user.email      || '';
+      await sb.from('profiles').upsert({
+        id: user.id, email: user.email,
+        first_name: fname, last_name: lname
+      }, { onConflict: 'id' });
+    }
+  } catch(e) {
+    console.warn('profiles fetch error:', e);
+    fname        = meta.first_name || '';
+    lname        = meta.last_name  || '';
+    profileEmail = user.email      || '';
+  }
+
+  const displayEmail = profileEmail || user.email || '';
+  const name = (fname + ' ' + lname).trim() || meta.full_name || meta.name || 'Member';
+  const initials = [(fname||'')[0], (lname||'')[0]].filter(Boolean).join('').toUpperCase() || '✦';
 
   document.getElementById('profile-name-display').textContent = name;
-  document.getElementById('profile-email-display').textContent = email;
-  document.getElementById('avatar-display').textContent = initials || '👤';
+  document.getElementById('profile-email-display').textContent = displayEmail;
+  document.getElementById('avatar-display').textContent = initials;
 
-  /* Pre-fill edit form */
-  const parts = name.split(' ');
-  document.getElementById('edit-fname').value = meta.first_name || parts[0] || '';
-  document.getElementById('edit-lname').value  = meta.last_name  || parts.slice(1).join(' ') || '';
-  document.getElementById('edit-email').value  = email;
-  if (meta.phone) document.getElementById('edit-phone').value = meta.phone;
+  document.getElementById('edit-fname').value  = fname;
+  document.getElementById('edit-lname').value  = lname;
+  document.getElementById('edit-email').value  = displayEmail;
+  if (phone) document.getElementById('edit-phone').value = phone;
 
-  /* Load orders */
   await loadOrders(user.id);
-
-  /* Load saved address */
   await loadAddress(user.id);
 }
 
@@ -643,15 +676,27 @@ async function saveProfile() {
   const lname = document.getElementById('edit-lname').value.trim();
   const phone = document.getElementById('edit-phone').value.trim();
 
-  const { error } = await sb.auth.updateUser({
+  /* Update auth metadata */
+  const { error: authErr } = await sb.auth.updateUser({
     data: { first_name: fname, last_name: lname, full_name: fname + ' ' + lname, phone }
   });
+  if (authErr) { showToast('Error: ' + authErr.message); return; }
 
-  if (error) { showToast('Error: ' + error.message); return; }
+  /* Upsert into profiles table (include email) */
+  const { error: dbErr } = await sb.from('profiles').upsert({
+    id:         user.id,
+    email:      user.email,
+    first_name: fname,
+    last_name:  lname,
+    phone:      phone,
+    updated_at: new Date().toISOString()
+  }, { onConflict: 'id' });
+  if (dbErr) console.warn('profiles upsert error:', dbErr);
 
-  document.getElementById('profile-name-display').textContent = fname + ' ' + lname;
-  const initials = (fname[0]||'') + (lname[0]||'');
-  document.getElementById('avatar-display').textContent = initials.toUpperCase() || '👤';
+  const name = (fname + ' ' + lname).trim();
+  const initials = [(fname||'')[0],(lname||'')[0]].filter(Boolean).join('').toUpperCase() || '✦';
+  document.getElementById('profile-name-display').textContent = name;
+  document.getElementById('avatar-display').textContent = initials;
   showToast('Profile updated! ✓');
 }
 
@@ -712,15 +757,26 @@ async function confirmDeleteAccount() {
 ══════════════════════════════════════════ */
 
 async function loadOrders(userId) {
-  const { data: orders, error } = await sb
-    .from('orders')
-    .select('*, order_items(*, products(name, icon))')
-    .eq('user_id', userId)
-    .order('created_at', { ascending: false });
-
   const container = document.getElementById('orders-list');
+  container.innerHTML = '<div style="text-align:center;padding:2rem;color:var(--muted);font-size:.85rem">Loading orders...</div>';
+
+  let orders, error;
+  try {
+    const res = await sb
+      .from('orders')
+      .select('*, order_items(qty, unit_price, product_id, products(name, icon))')
+      .eq('user_id', userId)
+      .order('created_at', { ascending: false });
+    orders = res.data;
+    error  = res.error;
+    console.log('Orders:', orders, 'Error:', error);
+  } catch(e) {
+    console.error('loadOrders exception:', e);
+    error = e;
+  }
 
   if (error || !orders || !orders.length) {
+    if (error) console.warn('Orders error:', error.message || error);
     container.innerHTML = `
       <div class="empty-state">
         <div class="icon">📋</div>
