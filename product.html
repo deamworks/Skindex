@@ -1,0 +1,327 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Product — Skindex</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400;1,600&family=DM+Sans:wght@300;400;500;600&display=swap">
+<link rel="stylesheet" href="shared.css">
+<style>
+.product-wrap{max-width:1200px;margin:0 auto;padding:2rem 3rem 4rem}
+
+/* breadcrumb */
+.breadcrumb{display:flex;gap:.5rem;align-items:center;font-size:.78rem;color:var(--muted);margin-bottom:2rem}
+.breadcrumb a{color:var(--muted);text-decoration:none;transition:color .2s}
+.breadcrumb a:hover{color:var(--coral)}
+.bc-sep{color:#CCC}
+
+/* layout */
+.product-layout{display:grid;grid-template-columns:1fr 480px;gap:4rem;align-items:start}
+
+/* gallery */
+.gallery{position:sticky;top:90px}
+.gallery-main{
+  background:var(--lavender);border-radius:var(--r-lg);
+  aspect-ratio:1;display:flex;align-items:center;justify-content:center;
+  font-size:9rem;margin-bottom:1rem;overflow:hidden;position:relative;
+}
+.gallery-thumbs{display:flex;gap:.75rem}
+.thumb{
+  width:72px;height:72px;background:var(--light);border-radius:10px;
+  display:flex;align-items:center;justify-content:center;font-size:2rem;
+  cursor:pointer;border:2px solid transparent;transition:border-color .2s;
+}
+.thumb.active{border-color:var(--coral)}
+
+/* info */
+.prod-badge-label{
+  display:inline-block;padding:.25rem .75rem;border-radius:20px;
+  font-size:.68rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase;
+  margin-bottom:1rem;
+}
+.prod-name{font-family:'Playfair Display',serif;font-size:2rem;font-weight:700;line-height:1.2;color:var(--dark);margin-bottom:.75rem}
+.prod-brand{font-size:.8rem;color:var(--muted);margin-bottom:.25rem;letter-spacing:.05em}
+.rating-row{display:flex;align-items:center;gap:.75rem;margin-bottom:1.5rem}
+.stars{color:#FFB347;font-size:1rem}
+.rating-num{font-size:.85rem;font-weight:600;color:var(--dark)}
+.review-count{font-size:.82rem;color:var(--muted);text-decoration:underline;cursor:pointer}
+
+.price-row{display:flex;align-items:baseline;gap:.75rem;margin-bottom:1.75rem;padding-bottom:1.75rem;border-bottom:1px solid rgba(0,0,0,.07)}
+.price-main{font-family:'Playfair Display',serif;font-size:2rem;color:var(--dark)}
+.price-was-tag{font-size:1rem;color:#BBB;text-decoration:line-through}
+.price-save-tag{background:#FFF0EE;color:var(--coral);font-size:.75rem;font-weight:700;padding:.2rem .6rem;border-radius:20px}
+
+.opt-label{font-size:.75rem;letter-spacing:.12em;text-transform:uppercase;font-weight:700;color:var(--muted);margin-bottom:.75rem}
+.shade-row{display:flex;flex-wrap:wrap;gap:.5rem;margin-bottom:1.75rem}
+.shade-btn{
+  padding:.45rem 1rem;border:1.5px solid #DDD;border-radius:8px;
+  font-size:.8rem;cursor:pointer;transition:all .2s;background:white;
+  font-family:'DM Sans',sans-serif;color:var(--text);
+}
+.shade-btn.active,.shade-btn:hover{border-color:var(--coral);color:var(--coral)}
+
+.qty-add-row{display:flex;align-items:center;gap:.75rem;margin-bottom:1.25rem}
+.qty-ctrl{display:flex;align-items:center;border:1.5px solid #DDD;border-radius:10px;overflow:hidden}
+.qty-ctrl button{width:40px;height:44px;background:none;border:none;font-size:1.2rem;cursor:pointer;transition:background .2s;color:var(--dark)}
+.qty-ctrl button:hover{background:var(--light)}
+.qty-ctrl span{font-size:.9rem;font-weight:600;min-width:32px;text-align:center}
+.btn-add-full{
+  flex:1;height:48px;background:var(--dark);color:white;border:none;
+  border-radius:10px;font-family:'DM Sans',sans-serif;font-size:.85rem;
+  font-weight:600;letter-spacing:.06em;text-transform:uppercase;cursor:pointer;transition:background .25s;
+}
+.btn-add-full:hover{background:var(--coral)}
+.btn-wish{
+  width:48px;height:48px;border:1.5px solid #DDD;border-radius:10px;
+  background:none;font-size:1.2rem;cursor:pointer;transition:all .2s;
+}
+.btn-wish:hover{border-color:var(--pink-vivid);background:var(--pink)}
+
+.meta-row{display:flex;align-items:flex-start;gap:.75rem;margin-bottom:.75rem;font-size:.83rem}
+.meta-icon{font-size:1.1rem;margin-top:.1rem}
+.meta-key{font-weight:600;color:var(--dark);min-width:110px;flex-shrink:0}
+.meta-val{color:var(--muted);line-height:1.5}
+
+/* tabs */
+.tabs{margin-top:2.5rem;border-top:1px solid rgba(0,0,0,.07)}
+.tab-nav{display:flex;gap:0;border-bottom:1px solid rgba(0,0,0,.07)}
+.tab-btn{
+  padding:.9rem 1.5rem;background:none;border:none;cursor:pointer;
+  font-family:'DM Sans',sans-serif;font-size:.8rem;font-weight:600;
+  letter-spacing:.08em;text-transform:uppercase;color:var(--muted);
+  border-bottom:2px solid transparent;margin-bottom:-1px;transition:all .2s;
+}
+.tab-btn.active{color:var(--coral);border-bottom-color:var(--coral)}
+.tab-panel{display:none;padding:2rem 0;font-size:.88rem;line-height:1.85;color:var(--muted)}
+.tab-panel.active{display:block}
+.tab-panel ul{list-style:none;display:flex;flex-direction:column;gap:.5rem}
+.tab-panel li{padding-left:1.25rem;position:relative}
+.tab-panel li::before{content:'—';position:absolute;left:0;color:#CCC}
+
+/* reviews inside tab */
+.review-list{display:flex;flex-direction:column;gap:1.5rem;margin-top:1rem}
+.review-item{padding:1.25rem;background:var(--light);border-radius:var(--r)}
+.ri-top{display:flex;justify-content:space-between;align-items:center;margin-bottom:.4rem}
+.ri-stars{color:#FFB347;font-size:.85rem}
+.ri-date{font-size:.72rem;color:#BBB}
+.ri-author{font-size:.82rem;font-weight:700;color:var(--dark);margin-bottom:.4rem}
+.ri-text{font-size:.85rem;color:var(--muted);line-height:1.7}
+
+/* related */
+.related{max-width:1200px;margin:0 auto;padding:0 3rem 4rem}
+.related h2{font-family:'Playfair Display',serif;font-size:1.4rem;font-weight:600;color:var(--dark);margin-bottom:1.5rem}
+.related-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:1.25rem}
+
+/* toast */
+.toast{
+  position:fixed;bottom:2rem;left:50%;transform:translateX(-50%) translateY(80px);
+  background:var(--dark);color:white;padding:.85rem 2rem;border-radius:var(--r);
+  font-size:.85rem;font-weight:500;z-index:999;transition:transform .3s;
+  white-space:nowrap;pointer-events:none;
+}
+.toast.show{transform:translateX(-50%) translateY(0)}
+
+@media(max-width:900px){
+  .product-wrap{padding:1.5rem}
+  .product-layout{grid-template-columns:1fr}
+  .gallery{position:static}
+  .related{padding:0 1.5rem 3rem}
+  .related-grid{grid-template-columns:repeat(2,1fr)}
+}
+</style>
+</head>
+<body>
+<script>window.SKINDEX_PAGE='product';</script>
+
+<div class="product-wrap">
+  <div class="breadcrumb">
+    <a href="index.html">Home</a><span class="bc-sep">›</span>
+    <a href="shop.html">Shop</a><span class="bc-sep">›</span>
+    <span id="bcName">Product</span>
+  </div>
+
+  <div class="product-layout">
+    <!-- GALLERY -->
+    <div class="gallery">
+      <div class="gallery-main" id="galMain"></div>
+      <div class="gallery-thumbs" id="galThumbs"></div>
+    </div>
+
+    <!-- INFO -->
+    <div>
+      <div id="pBadge"></div>
+      <div class="prod-brand" id="pBrand"></div>
+      <h1 class="prod-name" id="pName"></h1>
+      <div class="rating-row">
+        <span class="stars" id="pStars"></span>
+        <span class="rating-num" id="pRating"></span>
+        <span class="review-count" id="pRevCount" onclick="switchTab(null,'reviews')"></span>
+      </div>
+      <div class="price-row">
+        <span class="price-main" id="pPrice"></span>
+        <span class="price-was-tag" id="pWas"></span>
+        <span class="price-save-tag" id="pSave" style="display:none"></span>
+      </div>
+
+      <div class="opt-label" id="shadeLabel">Size / Shade</div>
+      <div class="shade-row" id="shadeRow"></div>
+
+      <div class="qty-add-row">
+        <div class="qty-ctrl">
+          <button onclick="changeQty(-1)">−</button>
+          <span id="qtyVal">1</span>
+          <button onclick="changeQty(1)">+</button>
+        </div>
+        <button class="btn-add-full" onclick="addToCartCurrent()">Add to Bag</button>
+        <button class="btn-wish">🤍</button>
+      </div>
+
+      <div id="pMeta" style="margin-top:1.5rem;padding-top:1.5rem;border-top:1px solid rgba(0,0,0,.07)"></div>
+
+      <div class="tabs">
+        <div class="tab-nav">
+          <button class="tab-btn active" onclick="switchTab(this,'desc')">Description</button>
+          <button class="tab-btn" onclick="switchTab(this,'ingr')">Ingredients</button>
+          <button class="tab-btn" onclick="switchTab(this,'reviews')">Reviews</button>
+        </div>
+        <div class="tab-panel active" id="tab-desc"></div>
+        <div class="tab-panel" id="tab-ingr"></div>
+        <div class="tab-panel" id="tab-reviews"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- RELATED -->
+<div class="related">
+  <h2>You May Also Like</h2>
+  <div class="related-grid" id="relatedGrid"></div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script src="store.js"></script>
+<script src="nav.js"></script>
+<script>
+  let currentId = 0;
+  let currentQty = 1;
+  let currentShade = '';
+
+  function loadProduct(id){
+    currentId = id;
+    currentQty = 1;
+    currentShade = '';
+    document.getElementById('qtyVal').textContent = '1';
+
+    const p = SKINDEX_PRODUCTS[id];
+    document.title = p.name + ' — Skindex';
+    document.getElementById('bcName').textContent = p.name;
+    document.getElementById('pBrand').textContent = p.brand.toUpperCase();
+    document.getElementById('pName').textContent = p.name;
+    document.getElementById('pStars').textContent = renderStars(p.rating);
+    document.getElementById('pRating').textContent = p.rating;
+    document.getElementById('pRevCount').textContent = p.reviewCount.toLocaleString()+' reviews';
+    document.getElementById('pPrice').textContent = '$'+p.price.toFixed(2);
+    const wasEl = document.getElementById('pWas');
+    const saveEl = document.getElementById('pSave');
+    if(p.was){ wasEl.textContent='$'+p.was.toFixed(2); saveEl.textContent='Save $'+(p.was-p.price).toFixed(2); saveEl.style.display='inline-block'; }
+    else      { wasEl.textContent=''; saveEl.style.display='none'; }
+
+    if(p.badge){
+      const colors = {new:'#4CAF90',sale:'var(--coral)',hot:'#FF6B35'};
+      document.getElementById('pBadge').innerHTML =
+        `<span class="prod-badge-label" style="background:${colors[p.badge]||'#999'};color:white">${p.badge.toUpperCase()}</span>`;
+    } else { document.getElementById('pBadge').innerHTML=''; }
+
+    // gallery
+    const icons = [p.icon,'🌿','✨'];
+    document.getElementById('galMain').innerHTML = `<span style="font-size:9rem">${p.icon}</span>`;
+    document.getElementById('galThumbs').innerHTML = icons.map((ic,i)=>
+      `<div class="thumb${i===0?' active':''}" onclick="setThumb(this,'${ic}')" style="background:${p.imgClass.includes('pink')?'#FFE4E8':p.imgClass.includes('butter')?'#FFF0D0':p.imgClass.includes('sage')?'#E0F0D8':'#EAE0F8'}">${ic}</div>`
+    ).join('');
+
+    // shades
+    currentShade = p.shades[0];
+    document.getElementById('shadeRow').innerHTML = p.shades.map((s,i)=>
+      `<button class="shade-btn${i===0?' active':''}" onclick="selectShade(this,'${s}')">${s}</button>`
+    ).join('');
+
+    // meta
+    const metas = [
+      {icon:'🌿', key:'Key Ingredient', val: p.ingredients.split(',').slice(0,2).join(', ')},
+      {icon:'🐰', key:'Cruelty-free',   val:'Yes — Leaping Bunny certified'},
+      {icon:'🏭', key:'Made in',        val:'South Korea'},
+    ];
+    document.getElementById('pMeta').innerHTML = metas.map(m=>
+      `<div class="meta-row"><span class="meta-icon">${m.icon}</span><span class="meta-key">${m.key}</span><span class="meta-val">${m.val}</span></div>`
+    ).join('');
+
+    // tabs
+    document.getElementById('tab-desc').innerHTML = `<p>${p.desc}</p>`;
+    document.getElementById('tab-ingr').innerHTML =
+      `<p style="font-size:.72rem;letter-spacing:.08em;text-transform:uppercase;margin-bottom:.75rem;color:#BBB">Full Ingredient List</p><p style="font-size:.82rem;line-height:2">${p.ingredients}</p>`;
+    document.getElementById('tab-reviews').innerHTML =
+      `<div style="display:flex;align-items:center;gap:1rem;margin-bottom:1.5rem">
+         <div style="font-family:'Playfair Display',serif;font-size:3rem;color:var(--dark)">${p.rating}</div>
+         <div><div style="color:#FFB347;font-size:1.1rem">${renderStars(p.rating)}</div>
+         <div style="font-size:.78rem;color:var(--muted)">${p.reviewCount.toLocaleString()} reviews</div></div>
+       </div>
+       <div class="review-list">${p.reviews.map(r=>`
+         <div class="review-item">
+           <div class="ri-top"><span class="ri-stars">${'★'.repeat(r.stars)}</span><span class="ri-date">${r.date}</span></div>
+           <div class="ri-author">${r.author}</div>
+           <div class="ri-text">${r.text}</div>
+         </div>`).join('')}</div>`;
+
+    // reset tabs
+    document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));
+    document.querySelectorAll('.tab-panel').forEach(p=>p.classList.remove('active'));
+    document.querySelector('.tab-btn').classList.add('active');
+    document.getElementById('tab-desc').classList.add('active');
+
+    // related
+    const related = SKINDEX_PRODUCTS.filter(pp=>pp.id!==id).slice(0,4);
+    document.getElementById('relatedGrid').innerHTML = related.map(pp=>productCardHTML(pp)).join('');
+  }
+
+  function setThumb(el,icon){
+    document.querySelectorAll('.thumb').forEach(t=>t.classList.remove('active'));
+    el.classList.add('active');
+    document.getElementById('galMain').innerHTML = `<span style="font-size:9rem">${icon}</span>`;
+  }
+  function selectShade(el,shade){
+    document.querySelectorAll('.shade-btn').forEach(b=>b.classList.remove('active'));
+    el.classList.add('active');
+    currentShade = shade;
+  }
+  function changeQty(d){
+    currentQty = Math.max(1, currentQty+d);
+    document.getElementById('qtyVal').textContent = currentQty;
+  }
+  function addToCartCurrent(){
+    for(let i=0;i<currentQty;i++) Cart.add(currentId, currentShade);
+    showToast('🛒 Added to bag!');
+  }
+  function switchTab(btn, id){
+    document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));
+    document.querySelectorAll('.tab-panel').forEach(p=>p.classList.remove('active'));
+    if(btn) btn.classList.add('active');
+    else document.querySelectorAll('.tab-btn')[2].classList.add('active'); // reviews tab
+    document.getElementById('tab-'+id).classList.add('active');
+  }
+
+  let toastT;
+  function showToast(msg){
+    const el = document.getElementById('toast');
+    el.textContent = msg;
+    el.classList.add('show');
+    clearTimeout(toastT);
+    toastT = setTimeout(()=>el.classList.remove('show'), 2400);
+  }
+
+  // Load from URL param
+  const pid = parseInt(new URLSearchParams(location.search).get('id'))||0;
+  loadProduct(pid);
+</script>
+</body>
+</html>

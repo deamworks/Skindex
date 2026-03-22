@@ -1,0 +1,209 @@
+/* ═══════════════════════════════════════
+   SKINDEX — shared.css
+   Used by: index, shop, product, cart, checkout
+   ═══════════════════════════════════════ */
+
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+
+:root{
+  --lavender:#E8E4F3;
+  --lavender-mid:#C4BAE8;
+  --lavender-deep:#8B7CC8;
+  --lavender-vivid:#7B5EA7;
+  --pink:#FFE4E8;
+  --pink-deep:#F4A0B0;
+  --pink-vivid:#E8687A;
+  --coral:#E8604A;
+  --cream:#FAFAF8;
+  --warm:#FDF6F0;
+  --dark:#1C1C2E;
+  --text:#3D3550;
+  --muted:#8A84A0;
+  --light:#F5F3FA;
+  --r:12px;
+  --r-lg:20px;
+}
+
+html{scroll-behavior:smooth}
+body{
+  font-family:'DM Sans',sans-serif;
+  background:var(--cream);
+  color:var(--text);
+  overflow-x:hidden;
+}
+
+/* ── TOPBAR ── */
+.topbar{
+  background:var(--lavender-deep);
+  color:white;
+  text-align:center;
+  padding:.45rem;
+  font-size:.75rem;
+  font-weight:500;
+  letter-spacing:.06em;
+}
+
+/* ── NAV ── */
+nav{
+  background:white;
+  border-bottom:1px solid rgba(0,0,0,.06);
+  position:sticky;
+  top:0;
+  z-index:100;
+}
+.nav-top{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  padding:.75rem 3rem;
+  border-bottom:1px solid rgba(0,0,0,.04);
+  position:relative;
+}
+.nav-social{display:flex;gap:.75rem;align-items:center}
+.nav-social a{
+  color:var(--muted);font-size:.85rem;
+  text-decoration:none;transition:color .2s;
+  display:flex;align-items:center;
+}
+.nav-social a:hover{color:var(--coral)}
+.nav-logo{
+  font-family:'Playfair Display',serif;
+  font-size:1.7rem;font-weight:700;
+  color:var(--coral);letter-spacing:.05em;
+  text-decoration:none;
+  position:absolute;
+  left:50%;
+  transform:translateX(-50%);
+}
+.nav-actions{display:flex;align-items:center;gap:1.2rem}
+.nav-icon{
+  background:none;border:none;cursor:pointer;
+  color:var(--text);font-size:1rem;padding:.3rem;
+  position:relative;transition:color .2s;
+}
+.nav-icon:hover{color:var(--coral)}
+.cart-badge{
+  position:absolute;top:-4px;right:-4px;
+  width:16px;height:16px;
+  background:var(--coral);color:white;
+  border-radius:50%;font-size:.55rem;font-weight:700;
+  display:flex;align-items:center;justify-content:center;
+}
+.cart-total{font-size:.82rem;font-weight:600;color:var(--text)}
+.nav-main{
+  display:flex;align-items:center;justify-content:center;
+  gap:3rem;padding:.7rem 3rem;
+}
+.nav-main a{
+  font-size:.83rem;font-weight:500;color:var(--text);
+  text-decoration:none;letter-spacing:.08em;text-transform:uppercase;
+  transition:color .2s;padding:.25rem 0;
+  border-bottom:2px solid transparent;
+}
+.nav-main a:hover,
+.nav-main a.active{color:var(--coral);border-bottom-color:var(--coral)}
+
+/* ── FOOTER ── */
+footer{background:var(--dark);color:rgba(255,255,255,.7);padding:3rem 3rem 2rem}
+.footer-top{
+  display:grid;grid-template-columns:2fr 1fr 1fr 1fr;
+  gap:3rem;margin-bottom:2rem;
+}
+.footer-brand .footer-logo{
+  font-family:'Playfair Display',serif;
+  font-size:1.4rem;color:var(--coral);
+  font-weight:700;margin-bottom:.75rem;
+}
+.footer-desc{font-size:.8rem;line-height:1.8;max-width:220px}
+.footer-col-title{
+  font-size:.78rem;font-weight:700;color:white;
+  letter-spacing:.1em;text-transform:uppercase;margin-bottom:1rem;
+}
+.footer-links{list-style:none;display:flex;flex-direction:column;gap:.5rem}
+.footer-links a{font-size:.8rem;color:rgba(255,255,255,.5);text-decoration:none;transition:color .2s}
+.footer-links a:hover{color:white}
+.footer-bottom{
+  border-top:1px solid rgba(255,255,255,.08);
+  padding-top:1.5rem;
+  display:flex;justify-content:space-between;align-items:center;
+}
+.footer-copy{font-size:.75rem;color:rgba(255,255,255,.3)}
+.footer-social{display:flex;gap:.6rem}
+.fsoc{
+  width:32px;height:32px;border-radius:50%;
+  background:rgba(255,255,255,.08);
+  display:flex;align-items:center;justify-content:center;
+  font-size:.75rem;color:rgba(255,255,255,.5);
+  text-decoration:none;transition:all .2s;
+}
+.fsoc:hover{background:var(--coral);color:white}
+
+/* ── SHARED BUTTONS ── */
+.btn-coral{
+  display:inline-flex;align-items:center;gap:.5rem;
+  background:var(--coral);color:white;border:none;
+  padding:.75rem 1.8rem;border-radius:var(--r);
+  font-family:'DM Sans',sans-serif;font-size:.85rem;font-weight:600;
+  cursor:pointer;transition:all .25s;letter-spacing:.03em;width:fit-content;
+}
+.btn-coral:hover{background:#d4503a;transform:translateY(-2px);box-shadow:0 8px 20px rgba(232,96,74,.3)}
+
+.btn-outline{
+  display:inline-flex;align-items:center;gap:.4rem;
+  border:1.5px solid var(--dark);color:var(--dark);background:none;
+  padding:.4rem 1rem;border-radius:6px;font-size:.75rem;font-weight:600;
+  cursor:pointer;transition:all .2s;letter-spacing:.05em;text-transform:uppercase;
+}
+.btn-outline:hover{background:var(--dark);color:white}
+
+/* ── REVEAL ANIMATION ── */
+.reveal{opacity:0;transform:translateY(24px);transition:opacity .6s,transform .6s}
+.reveal.visible{opacity:1;transform:translateY(0)}
+.d1{transition-delay:.1s}
+.d2{transition-delay:.2s}
+.d3{transition-delay:.3s}
+
+/* ── PRODUCT CARD (shared between index & shop) ── */
+.product-card{
+  background:var(--light);border-radius:var(--r-lg);overflow:hidden;
+  transition:transform .25s,box-shadow .25s;cursor:pointer;position:relative;
+}
+.product-card:hover{transform:translateY(-4px);box-shadow:0 12px 30px rgba(0,0,0,.08)}
+.product-img{
+  height:180px;display:flex;align-items:center;
+  justify-content:center;font-size:4.5rem;position:relative;
+}
+.product-img-pink{background:linear-gradient(135deg,#FFE0E8,#FFD0DC)}
+.product-img-lavender{background:linear-gradient(135deg,#EAE0F8,#DDD0F0)}
+.product-img-sage{background:linear-gradient(135deg,#DDF0E0,#C0DEC8)}
+.product-img-butter{background:linear-gradient(135deg,#FFF0D0,#F8DDA0)}
+.product-badge{
+  position:absolute;top:.75rem;left:.75rem;
+  padding:.25rem .6rem;border-radius:6px;
+  font-size:.65rem;font-weight:700;letter-spacing:.05em;
+}
+.badge-new{background:#4CAF90;color:white}
+.badge-sale{background:var(--coral);color:white}
+.badge-hot{background:#FF6B35;color:white}
+.product-info{padding:.9rem 1rem}
+.product-name{font-size:.85rem;font-weight:600;color:var(--dark);margin-bottom:.2rem}
+.product-stars{color:#FFB347;font-size:.72rem;margin-bottom:.5rem}
+.product-stars span{color:var(--muted);font-size:.7rem}
+.product-price{display:flex;align-items:center;gap:.5rem}
+.price-old{font-size:.78rem;color:var(--muted);text-decoration:line-through}
+.price-new{font-size:.95rem;font-weight:700;color:var(--dark)}
+.btn-add{
+  width:100%;margin-top:.75rem;padding:.5rem;
+  background:var(--dark);color:white;border:none;border-radius:8px;
+  font-size:.75rem;font-weight:600;cursor:pointer;transition:all .2s;
+  letter-spacing:.05em;text-transform:uppercase;font-family:'DM Sans',sans-serif;
+}
+.btn-add:hover{background:var(--coral)}
+
+/* ── RESPONSIVE ── */
+@media(max-width:900px){
+  .nav-top{padding:.75rem 1.5rem}
+  .nav-main{gap:1.5rem;padding:.6rem 1.5rem}
+  .footer-top{grid-template-columns:1fr 1fr;gap:2rem}
+  footer{padding:2.5rem 1.5rem}
+}

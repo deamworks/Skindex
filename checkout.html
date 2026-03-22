@@ -1,0 +1,343 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Checkout — Skindex</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400;1,600&family=DM+Sans:wght@300;400;500;600&display=swap">
+<link rel="stylesheet" href="shared.css">
+<style>
+.co-wrap{max-width:1060px;margin:0 auto;padding:3rem 3rem 5rem}
+.co-wrap h1{font-family:'Playfair Display',serif;font-size:2rem;font-weight:700;color:var(--dark);margin-bottom:.25rem}
+.co-wrap .subtitle{font-size:.82rem;color:var(--muted);margin-bottom:2.5rem}
+
+/* steps */
+.steps{display:flex;align-items:center;gap:0;margin-bottom:2.5rem}
+.step{display:flex;align-items:center;gap:.5rem;font-size:.78rem;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:#CCC}
+.step.active{color:var(--coral)}
+.step.done{color:#4CAF90}
+.step-num{width:24px;height:24px;border-radius:50%;border:2px solid currentColor;display:flex;align-items:center;justify-content:center;font-size:.65rem;flex-shrink:0}
+.step-sep{flex:1;height:1px;background:#DDD;max-width:40px;margin:0 .5rem}
+
+.co-layout{display:grid;grid-template-columns:1fr 360px;gap:3rem;align-items:start}
+
+/* form */
+.form-section{margin-bottom:2rem;padding-bottom:2rem;border-bottom:1px solid rgba(0,0,0,.07)}
+.form-section:last-child{border-bottom:none}
+.fs-title{font-size:.72rem;letter-spacing:.15em;text-transform:uppercase;font-weight:700;color:var(--dark);margin-bottom:1.25rem}
+.form-grid{display:grid;grid-template-columns:1fr 1fr;gap:1rem;margin-bottom:.75rem}
+.form-grid.full{grid-template-columns:1fr}
+.form-group{display:flex;flex-direction:column;gap:.35rem}
+.form-label{font-size:.7rem;letter-spacing:.08em;text-transform:uppercase;font-weight:600;color:var(--muted)}
+.form-input{
+  border:1.5px solid #DDD;border-radius:8px;padding:.7rem 1rem;
+  font-family:'DM Sans',sans-serif;font-size:.88rem;
+  color:var(--dark);outline:none;background:white;transition:border-color .2s;
+}
+.form-input:focus{border-color:var(--coral)}
+.form-input::placeholder{color:#CCC}
+.form-input.error{border-color:var(--coral)}
+
+/* payment */
+.pay-methods{display:flex;gap:.5rem;flex-wrap:wrap;margin-bottom:1.25rem}
+.pay-pill{
+  padding:.3rem .9rem;border:1.5px solid #DDD;border-radius:20px;
+  font-size:.75rem;font-weight:700;color:var(--muted);cursor:pointer;
+  transition:all .2s;background:white;
+}
+.pay-pill.active{border-color:var(--coral);color:var(--coral);background:#FFF5F3}
+.pay-radio-group{display:flex;flex-direction:column;gap:.6rem;margin-bottom:1.25rem}
+.pay-radio{
+  display:flex;align-items:center;gap:.75rem;padding:.9rem 1.1rem;
+  border:1.5px solid #DDD;border-radius:10px;cursor:pointer;transition:border-color .2s;
+}
+.pay-radio.active{border-color:var(--coral)}
+.pay-dot{width:16px;height:16px;border-radius:50%;border:1.5px solid #CCC;flex-shrink:0;transition:all .2s;position:relative}
+.pay-radio.active .pay-dot{border-color:var(--coral)}
+.pay-radio.active .pay-dot::after{content:'';position:absolute;inset:3px;background:var(--coral);border-radius:50%}
+.pay-radio-label{font-size:.85rem;font-weight:500;color:var(--dark)}
+.pay-radio-sub{font-size:.75rem;color:var(--muted);margin-left:auto}
+
+/* order summary */
+.order-summary{background:var(--light);border-radius:var(--r-lg);padding:1.75rem;position:sticky;top:90px}
+.os-title{font-family:'Playfair Display',serif;font-size:1.15rem;font-weight:600;color:var(--dark);margin-bottom:1.25rem}
+.os-items{margin-bottom:1.25rem;padding-bottom:1.25rem;border-bottom:1px solid rgba(0,0,0,.07)}
+.os-item{display:flex;align-items:center;gap:.75rem;margin-bottom:.85rem}
+.os-item:last-child{margin-bottom:0}
+.os-img{position:relative;width:52px;height:52px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:1.6rem;flex-shrink:0}
+.os-qty{position:absolute;top:-6px;right:-6px;width:18px;height:18px;background:var(--dark);color:white;border-radius:50%;font-size:.6rem;font-weight:700;display:flex;align-items:center;justify-content:center}
+.os-name{flex:1;font-size:.82rem;font-weight:500;color:var(--dark);line-height:1.3}
+.os-price{font-size:.85rem;font-weight:700;color:var(--dark);white-space:nowrap}
+.s-row{display:flex;justify-content:space-between;font-size:.85rem;color:var(--text);margin-bottom:.5rem}
+.s-row.total{font-weight:700;font-size:1rem;color:var(--dark);padding-top:.75rem;margin-top:.5rem;border-top:1px solid rgba(0,0,0,.08)}
+.btn-place{
+  width:100%;margin-top:1.5rem;padding:1.05rem;
+  background:var(--coral);color:white;border:none;border-radius:var(--r);
+  font-family:'DM Sans',sans-serif;font-size:.88rem;font-weight:700;
+  letter-spacing:.08em;text-transform:uppercase;cursor:pointer;transition:background .2s;
+}
+.btn-place:hover{background:#d4503a}
+.secure-note{text-align:center;font-size:.72rem;color:var(--muted);margin-top:.75rem}
+
+/* success */
+.success-wrap{max-width:540px;margin:5rem auto;text-align:center;padding:0 2rem}
+.success-icon{font-size:4rem;margin-bottom:1.5rem}
+.success-wrap h2{font-family:'Playfair Display',serif;font-size:2rem;color:var(--dark);margin-bottom:.75rem}
+.success-wrap p{font-size:.88rem;color:var(--muted);line-height:1.8;margin-bottom:2rem}
+.order-num-box{background:var(--light);border-radius:var(--r);padding:1rem 1.5rem;font-size:.85rem;color:var(--muted);margin-bottom:2rem}
+.order-num-box strong{color:var(--dark)}
+
+@media(max-width:900px){
+  .co-wrap{padding:2rem 1.5rem}
+  .co-layout{grid-template-columns:1fr}
+  .order-summary{position:static}
+  .form-grid{grid-template-columns:1fr}
+}
+</style>
+</head>
+<body>
+<script>window.SKINDEX_PAGE='checkout';</script>
+
+<!-- CHECKOUT FORM -->
+<div id="checkoutView">
+  <div class="co-wrap">
+    <h1>Checkout</h1>
+    <p class="subtitle">🔒 Secure &amp; encrypted payment</p>
+
+    <!-- Steps indicator -->
+    <div class="steps">
+      <div class="step active" id="step1"><div class="step-num">1</div>Information</div>
+      <div class="step-sep"></div>
+      <div class="step" id="step2"><div class="step-num">2</div>Shipping</div>
+      <div class="step-sep"></div>
+      <div class="step" id="step3"><div class="step-num">3</div>Payment</div>
+    </div>
+
+    <div class="co-layout">
+      <div>
+        <!-- CONTACT -->
+        <div class="form-section">
+          <div class="fs-title">Contact Information</div>
+          <div class="form-grid full"><div class="form-group"><label class="form-label">Email Address</label><input class="form-input" id="f-email" type="email" placeholder="you@example.com"></div></div>
+          <div class="form-grid">
+            <div class="form-group"><label class="form-label">First Name</label><input class="form-input" id="f-fname" placeholder="Jane"></div>
+            <div class="form-group"><label class="form-label">Last Name</label><input class="form-input" id="f-lname" placeholder="Doe"></div>
+          </div>
+          <div class="form-grid full"><div class="form-group"><label class="form-label">Phone (optional)</label><input class="form-input" placeholder="+1 (555) 000-0000"></div></div>
+        </div>
+
+        <!-- SHIPPING -->
+        <div class="form-section">
+          <div class="fs-title">Shipping Address</div>
+          <div class="form-grid full"><div class="form-group"><label class="form-label">Address Line 1</label><input class="form-input" id="f-addr" placeholder="123 Main Street"></div></div>
+          <div class="form-grid full"><div class="form-group"><label class="form-label">Address Line 2 (optional)</label><input class="form-input" placeholder="Apt, suite, etc."></div></div>
+          <div class="form-grid">
+            <div class="form-group"><label class="form-label">City</label><input class="form-input" id="f-city" placeholder="New York"></div>
+            <div class="form-group"><label class="form-label">ZIP / Postal Code</label><input class="form-input" placeholder="10001"></div>
+          </div>
+          <div class="form-grid">
+            <div class="form-group"><label class="form-label">State / Province</label><input class="form-input" placeholder="NY"></div>
+            <div class="form-group"><label class="form-label">Country</label><input class="form-input" value="United States"></div>
+          </div>
+        </div>
+
+        <!-- PAYMENT -->
+        <div class="form-section">
+          <div class="fs-title">Payment Method</div>
+          <div class="pay-methods">
+            <button class="pay-pill active">💳 Card</button>
+            <button class="pay-pill">PayPal</button>
+            <button class="pay-pill"> Apple Pay</button>
+            <button class="pay-pill">🏦 Bank</button>
+          </div>
+          <div class="pay-radio-group">
+            <div class="pay-radio active" onclick="selectPay(this)"><div class="pay-dot"></div><span class="pay-radio-label">Credit / Debit Card</span></div>
+            <div class="pay-radio" onclick="selectPay(this)"><div class="pay-dot"></div><span class="pay-radio-label">PayPal</span><span class="pay-radio-sub">Redirects to PayPal</span></div>
+            <div class="pay-radio" onclick="selectPay(this)"><div class="pay-dot"></div><span class="pay-radio-label">Apple Pay</span></div>
+          </div>
+          <div id="cardFields">
+            <div class="form-grid full"><div class="form-group"><label class="form-label">Card Number</label><input class="form-input" id="f-card" placeholder="1234 5678 9012 3456" maxlength="19" oninput="fmtCard(this)"></div></div>
+            <div class="form-grid">
+              <div class="form-group"><label class="form-label">Expiry Date</label><input class="form-input" placeholder="MM / YY" maxlength="7" oninput="fmtExp(this)"></div>
+              <div class="form-group"><label class="form-label">CVV / CVC</label><input class="form-input" placeholder="123" maxlength="4" type="password"></div>
+            </div>
+            <div class="form-grid full"><div class="form-group"><label class="form-label">Name on Card</label><input class="form-input" placeholder="Jane Doe"></div></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ORDER SUMMARY -->
+      <div class="order-summary">
+        <div class="os-title">Order Summary</div>
+        <div class="os-items" id="osSummary"></div>
+        <div id="summaryRows"></div>
+        <button class="btn-place" onclick="placeOrder()">Place Order →</button>
+        <div class="secure-note">Your data is encrypted and never shared.</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- SUCCESS VIEW -->
+<div id="successView" style="display:none">
+  <div class="success-wrap">
+    <div class="success-icon">✅</div>
+    <h2>Order Confirmed!</h2>
+    <p>Thank you for your order. A confirmation email has been sent.<br>Estimated delivery: <strong>3–5 business days</strong>.</p>
+    <div class="order-num-box">Order number: <strong id="orderNum"></strong></div>
+    <button class="btn-coral" onclick="window.location='index.html'">Continue Shopping →</button>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="store.js"></script>
+<script src="nav.js"></script>
+<script>
+  function renderSummary(){
+    const cart = Cart.get();
+    const sub  = Cart.total();
+    const ship = sub >= 500 ? 0 : 9.90;
+
+    document.getElementById('osSummary').innerHTML = cart.map(item=>`
+      <div class="os-item">
+        <div class="os-img ${item.imgClass}">${item.icon}<div class="os-qty">${item.qty}</div></div>
+        <div class="os-name">${item.name}<br><span style="font-size:.72rem;color:var(--muted)">${item.shade}</span></div>
+        <div class="os-price">$${(item.price*item.qty).toFixed(2)}</div>
+      </div>
+    `).join('') || '<p style="font-size:.82rem;color:var(--muted)">Your bag is empty.</p>';
+
+    document.getElementById('summaryRows').innerHTML = `
+      <div class="s-row"><span>Subtotal</span><span>$${sub.toFixed(2)}</span></div>
+      <div class="s-row"><span>Shipping</span><span style="color:#4CAF90">${ship===0?'Free':'$'+ship.toFixed(2)}</span></div>
+      <div class="s-row total"><span>Total</span><span>$${(sub+ship).toFixed(2)}</span></div>`;
+  }
+
+  function selectPay(el){
+    document.querySelectorAll('.pay-radio').forEach(r=>r.classList.remove('active'));
+    el.classList.add('active');
+  }
+
+  function fmtCard(el){
+    let v = el.value.replace(/\D/g,'').slice(0,16);
+    el.value = v.replace(/(.{4})/g,'$1 ').trim();
+  }
+  function fmtExp(el){
+    let v = el.value.replace(/\D/g,'').slice(0,4);
+    if(v.length>2) v = v.slice(0,2)+' / '+v.slice(2);
+    el.value = v;
+  }
+
+  function validate(){
+    let ok = true;
+    ['f-email','f-fname','f-lname','f-addr','f-city'].forEach(id=>{
+      const el = document.getElementById(id);
+      if(!el) return;
+      if(!el.value.trim()){
+        el.classList.add('error');
+        ok = false;
+      } else { el.classList.remove('error'); }
+    });
+    return ok;
+  }
+
+  // Update step indicator as user fills fields
+  ['f-fname','f-lname','f-email'].forEach(id=>{
+    const el = document.getElementById(id);
+    if(el) el.addEventListener('input', ()=>{
+      if(document.getElementById('f-fname').value && document.getElementById('f-email').value)
+        document.getElementById('step1').classList.add('done');
+    });
+  });
+  ['f-addr','f-city'].forEach(id=>{
+    const el = document.getElementById(id);
+    if(el) el.addEventListener('input', ()=>{
+      if(document.getElementById('f-addr').value && document.getElementById('f-city').value)
+        document.getElementById('step2').classList.add('done');
+    });
+  });
+  const cardEl = document.getElementById('f-card');
+  if(cardEl) cardEl.addEventListener('input', ()=>{
+    if(cardEl.value.replace(/\s/g,'').length===16){
+      document.getElementById('step3').classList.add('done');
+    }
+  });
+
+  /* ── Supabase client ── */
+  var _sb = null;
+  function getSB(){
+    if(!_sb && typeof supabase !== 'undefined'){
+      _sb = supabase.createClient('https://qjmabovxjcabpveahfge.supabase.co','eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InFqbWFib3Z4amNhYnB2ZWFoZmdlIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQxODcwMzgsImV4cCI6MjA4OTc2MzAzOH0.ypzU22gs9qQZcCsyinhljXdqfnEWiogt3Mc1AHsq_F8');
+    }
+    return _sb;
+  }
+
+  async function placeOrder(){
+    if(!validate()){ return; }
+
+    var btn = document.querySelector('.btn-place');
+    btn.textContent = 'Processing...';
+    btn.disabled = true;
+
+    var cart  = Cart.get();
+    var sub   = Cart.total();
+    var ship  = sub >= 500 ? 0 : 9.90;
+    var total = sub + ship;
+    var num   = 'SK-' + Date.now().toString(36).toUpperCase();
+
+    var sb = getSB();
+
+    if(sb && cart.length){
+      try{
+        /* get current user (null if guest) */
+        var sessionRes = await sb.auth.getSession();
+        var userId = sessionRes.data.session ? sessionRes.data.session.user.id : null;
+
+        /* insert order */
+        var orderRes = await sb.from('orders').insert({
+          user_id:       userId,
+          order_number:  num,
+          subtotal:      sub,
+          shipping:      ship,
+          total:         total,
+          payment_method: document.querySelector('.pay-radio.active .pay-radio-label') ?
+                           document.querySelector('.pay-radio.active .pay-radio-label').textContent : 'Card',
+          shipping_addr: {
+            email:    document.getElementById('f-email').value,
+            name:     document.getElementById('f-fname').value + ' ' + document.getElementById('f-lname').value,
+            address:  document.getElementById('f-addr').value,
+            city:     document.getElementById('f-city').value,
+            country:  'Thailand'
+          }
+        }).select().single();
+
+        if(!orderRes.error && orderRes.data){
+          /* insert order items */
+          var items = cart.map(function(i){
+            return {
+              order_id:   orderRes.data.id,
+              product_id: i.id,
+              variant:    i.shade || '',
+              qty:        i.qty,
+              unit_price: i.price
+            };
+          });
+          await sb.from('order_items').insert(items);
+        }
+      } catch(e){
+        console.warn('Order save error:', e);
+      }
+    }
+
+    document.getElementById('orderNum').textContent = '#' + num;
+    Cart.clear();
+    btn.textContent = 'Place Order →';
+    btn.disabled = false;
+    document.getElementById('checkoutView').style.display='none';
+    document.getElementById('successView').style.display='block';
+    window.scrollTo({top:0,behavior:'smooth'});
+  }
+
+  renderSummary();
+</script>
+</body>
+</html>

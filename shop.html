@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Shop — Skindex</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400;1,600&family=DM+Sans:wght@300;400;500;600&display=swap">
+<link rel="stylesheet" href="shared.css">
+<style>
+.shop-wrap{max-width:1200px;margin:0 auto;padding:3rem 3rem}
+.shop-head{margin-bottom:2.5rem}
+.shop-head h1{font-family:'Playfair Display',serif;font-size:2rem;font-weight:700;color:var(--dark);margin-bottom:.25rem}
+.shop-head p{font-size:.85rem;color:var(--muted)}
+
+.shop-layout{display:grid;grid-template-columns:220px 1fr;gap:3rem}
+
+/* ── FILTERS ── */
+.filters{position:sticky;top:100px;align-self:start}
+.filter-group{margin-bottom:2rem;padding-bottom:2rem;border-bottom:1px solid rgba(0,0,0,.07)}
+.filter-group:last-child{border-bottom:none;margin-bottom:0}
+.filter-label{font-size:.72rem;letter-spacing:.12em;text-transform:uppercase;font-weight:700;color:var(--dark);margin-bottom:.9rem}
+.filter-options{display:flex;flex-direction:column;gap:.5rem}
+.f-opt{display:flex;align-items:center;gap:.65rem;cursor:pointer;font-size:.83rem;color:var(--muted);transition:color .15s;user-select:none}
+.f-opt:hover{color:var(--dark)}
+.f-check{width:16px;height:16px;border:1.5px solid #CCC;border-radius:3px;display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:all .15s}
+.f-opt.active .f-check{background:var(--coral);border-color:var(--coral)}
+.f-opt.active .f-check::after{content:'✓';font-size:.6rem;color:white;line-height:1}
+.f-opt.active{color:var(--dark);font-weight:500}
+.f-count{margin-left:auto;font-size:.72rem;color:#CCC}
+.price-inputs{display:flex;align-items:center;gap:.5rem;margin-top:.5rem}
+.price-inputs input{
+  width:80px;border:1px solid #DDD;border-radius:6px;
+  padding:.4rem .6rem;font-size:.8rem;font-family:'DM Sans',sans-serif;
+  outline:none;color:var(--dark);
+}
+.price-inputs input:focus{border-color:var(--coral)}
+.price-inputs span{color:var(--muted);font-size:.85rem}
+.filter-btn-clear{
+  width:100%;margin-top:.5rem;padding:.45rem;
+  border:1px solid #DDD;border-radius:6px;background:none;
+  font-family:'DM Sans',sans-serif;font-size:.75rem;color:var(--muted);
+  cursor:pointer;transition:all .15s;letter-spacing:.05em;
+}
+.filter-btn-clear:hover{border-color:var(--coral);color:var(--coral)}
+
+/* ── TOOLBAR ── */
+.toolbar{display:flex;align-items:center;justify-content:space-between;margin-bottom:1.5rem;padding-bottom:1rem;border-bottom:1px solid rgba(0,0,0,.07)}
+.result-count{font-size:.82rem;color:var(--muted)}
+.sort-select{
+  border:1px solid #DDD;border-radius:8px;
+  padding:.4rem .9rem;font-family:'DM Sans',sans-serif;
+  font-size:.8rem;color:var(--dark);outline:none;background:white;cursor:pointer;
+}
+
+/* ── PRODUCT GRID ── */
+.prod-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:1.5rem}
+
+/* ── PAGINATION ── */
+.pagination{display:flex;justify-content:center;gap:.5rem;margin-top:3rem}
+.page-btn{
+  width:36px;height:36px;border-radius:8px;border:1px solid #DDD;
+  background:none;font-size:.85rem;cursor:pointer;transition:all .2s;
+  font-family:'DM Sans',sans-serif;color:var(--text);
+}
+.page-btn:hover,.page-btn.active{background:var(--coral);color:white;border-color:var(--coral)}
+
+@media(max-width:900px){
+  .shop-wrap{padding:2rem 1.5rem}
+  .shop-layout{grid-template-columns:1fr}
+  .filters{position:static;display:flex;flex-wrap:wrap;gap:1rem}
+  .filter-group{margin-bottom:0;padding-bottom:0;border:none;min-width:140px}
+  .prod-grid{grid-template-columns:repeat(2,1fr)}
+}
+</style>
+</head>
+<body>
+<script>window.SKINDEX_PAGE='shop';</script>
+
+<div class="shop-wrap">
+  <div class="shop-head">
+    <h1 id="shopTitle">All Products</h1>
+    <p id="shopSubtitle">Discover our full range of clean beauty essentials</p>
+  </div>
+
+  <div class="shop-layout">
+
+    <!-- SIDEBAR FILTERS -->
+    <aside class="filters">
+      <div class="filter-group">
+        <div class="filter-label">Category</div>
+        <div class="filter-options" id="filterCat">
+          <div class="f-opt active" data-cat="All" onclick="setFilter('cat',this)"><div class="f-check"></div>All<span class="f-count">8</span></div>
+          <div class="f-opt" data-cat="Serum" onclick="setFilter('cat',this)"><div class="f-check"></div>Serum<span class="f-count">2</span></div>
+          <div class="f-opt" data-cat="Moisturizer" onclick="setFilter('cat',this)"><div class="f-check"></div>Moisturizer<span class="f-count">2</span></div>
+          <div class="f-opt" data-cat="Toner" onclick="setFilter('cat',this)"><div class="f-check"></div>Toner<span class="f-count">2</span></div>
+          <div class="f-opt" data-cat="Cleanser" onclick="setFilter('cat',this)"><div class="f-check"></div>Cleanser<span class="f-count">1</span></div>
+          <div class="f-opt" data-cat="SPF" onclick="setFilter('cat',this)"><div class="f-check"></div>SPF<span class="f-count">1</span></div>
+        </div>
+      </div>
+
+      <div class="filter-group">
+        <div class="filter-label">Price Range</div>
+        <div class="price-inputs">
+          <input type="number" id="priceMin" placeholder="$0" oninput="renderGrid()">
+          <span>—</span>
+          <input type="number" id="priceMax" placeholder="$100" oninput="renderGrid()">
+        </div>
+      </div>
+
+      <div class="filter-group">
+        <div class="filter-label">Highlights</div>
+        <div class="filter-options">
+          <div class="f-opt" data-highlight="new" onclick="setFilter('highlight',this)"><div class="f-check"></div>New Arrivals</div>
+          <div class="f-opt" data-highlight="sale" onclick="setFilter('highlight',this)"><div class="f-check"></div>On Sale</div>
+        </div>
+      </div>
+
+      <div class="filter-group">
+        <button class="filter-btn-clear" onclick="clearFilters()">✕ Clear All Filters</button>
+      </div>
+    </aside>
+
+    <!-- PRODUCT AREA -->
+    <div>
+      <div class="toolbar">
+        <div class="result-count" id="resultCount">8 products</div>
+        <select class="sort-select" id="sortBy" onchange="renderGrid()">
+          <option value="default">Featured</option>
+          <option value="price-asc">Price: Low → High</option>
+          <option value="price-desc">Price: High → Low</option>
+          <option value="rating">Highest Rated</option>
+        </select>
+      </div>
+
+      <div class="prod-grid" id="prodGrid"></div>
+
+      <div class="pagination">
+        <button class="page-btn active">1</button>
+        <button class="page-btn">2</button>
+        <button class="page-btn">3</button>
+        <button class="page-btn">→</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script src="store.js"></script>
+<script src="nav.js"></script>
+<script>
+  let activeFilters = {cat:'All', highlight: null};
+
+  function setFilter(type, el){
+    const group = el.parentElement;
+    group.querySelectorAll('.f-opt').forEach(o=>o.classList.remove('active'));
+    el.classList.add('active');
+    if(type==='cat')       activeFilters.cat       = el.dataset.cat||'All';
+    if(type==='highlight') activeFilters.highlight = el.classList.contains('active') ? el.dataset.highlight : null;
+    renderGrid();
+  }
+
+  function clearFilters(){
+    activeFilters = {cat:'All', highlight:null};
+    document.getElementById('priceMin').value='';
+    document.getElementById('priceMax').value='';
+    document.querySelectorAll('.f-opt').forEach(o=>o.classList.remove('active'));
+    document.querySelector('[data-cat="All"]').classList.add('active');
+    renderGrid();
+  }
+
+  function renderGrid(){
+    let items = [...SKINDEX_PRODUCTS];
+    if(activeFilters.cat && activeFilters.cat!=='All') items=items.filter(p=>p.cat===activeFilters.cat);
+    const minP = parseFloat(document.getElementById('priceMin').value)||0;
+    const maxP = parseFloat(document.getElementById('priceMax').value)||9999;
+    items = items.filter(p=>p.price>=minP&&p.price<=maxP);
+    if(activeFilters.highlight==='new')  items=items.filter(p=>p.badge==='new');
+    if(activeFilters.highlight==='sale') items=items.filter(p=>p.was!=null);
+    const sort = document.getElementById('sortBy').value;
+    if(sort==='price-asc')  items.sort((a,b)=>a.price-b.price);
+    if(sort==='price-desc') items.sort((a,b)=>b.price-a.price);
+    if(sort==='rating')     items.sort((a,b)=>b.rating-a.rating);
+    document.getElementById('resultCount').textContent = items.length+' product'+(items.length!==1?'s':'');
+    const grid = document.getElementById('prodGrid');
+    if(!items.length){
+      grid.innerHTML='<div style="grid-column:1/-1;padding:3rem;text-align:center;color:var(--muted)">No products match your filters.</div>';
+      return;
+    }
+    grid.innerHTML = items.map(p=>productCardHTML(p)).join('');
+  }
+
+  // Read URL param on load
+  const urlCat = new URLSearchParams(location.search).get('cat');
+  if(urlCat){
+    const matchEl = document.querySelector(`[data-cat="${urlCat}"]`);
+    if(matchEl){ setFilter('cat', matchEl); }
+  }
+  renderGrid();
+</script>
+</body>
+</html>

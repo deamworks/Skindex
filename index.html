@@ -1,0 +1,317 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Skindex — Beauty & Skincare</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400;1,600&family=DM+Sans:wght@300;400;500;600&display=swap">
+<link rel="stylesheet" href="shared.css">
+<style>
+/* ── HERO ── */
+.hero{display:grid;grid-template-columns:1fr 1fr;min-height:380px;background:var(--lavender)}
+.hero-content{padding:4rem 3rem 3rem;display:flex;flex-direction:column;justify-content:center}
+.hero-tag{font-size:.7rem;font-weight:600;letter-spacing:.2em;text-transform:uppercase;color:var(--coral);margin-bottom:1rem}
+.hero-title{font-family:'Playfair Display',serif;font-size:clamp(2rem,3.5vw,3rem);line-height:1.2;color:var(--dark);margin-bottom:1.5rem;font-weight:700}
+.hero-image{background:linear-gradient(135deg,#FFD6DC 0%,#FBBCC8 100%);display:flex;align-items:center;justify-content:center;font-size:8rem;position:relative;overflow:hidden}
+.product-circles{display:flex;flex-wrap:wrap;justify-content:center;align-items:center;height:100%;gap:1rem;padding:2rem;width:100%}
+.pcircle{width:90px;height:90px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:2.5rem;box-shadow:0 8px 24px rgba(0,0,0,.12)}
+.pc1{background:linear-gradient(135deg,#B0C4E8,#8FA8D8)}
+.pc2{background:linear-gradient(135deg,#F8D0D8,#F0B0BC);width:110px;height:110px}
+.pc3{background:linear-gradient(135deg,#C8E0C8,#A8C8A8)}
+.pc4{background:linear-gradient(135deg,#F8E0C0,#F0C8A0)}
+.pc5{background:linear-gradient(135deg,#E0C8F0,#C8A8E0);width:80px;height:80px}
+
+/* ── CATEGORIES ── */
+.categories{padding:3.5rem 3rem;background:white;text-align:center}
+.section-title{font-family:'Playfair Display',serif;font-size:1.5rem;font-weight:600;color:var(--dark);margin-bottom:2rem}
+.cat-grid{display:flex;gap:2rem;justify-content:center;flex-wrap:wrap}
+.cat-item{display:flex;flex-direction:column;align-items:center;gap:.6rem;cursor:pointer;transition:transform .2s;text-decoration:none}
+.cat-item:hover{transform:translateY(-3px)}
+.cat-circle{width:80px;height:80px;border-radius:50%;position:relative;display:flex;align-items:center;justify-content:center;font-size:2rem;border:2px solid white;box-shadow:0 4px 15px rgba(0,0,0,.08)}
+.cat-badge{position:absolute;bottom:2px;right:2px;width:22px;height:22px;background:var(--dark);color:white;border-radius:50%;font-size:.6rem;font-weight:700;display:flex;align-items:center;justify-content:center;border:2px solid white}
+.cat-c1{background:linear-gradient(135deg,#F9D4DC,#F4B0BE)}
+.cat-c2{background:linear-gradient(135deg,#D4E4F8,#B8CFF0)}
+.cat-c3{background:linear-gradient(135deg,#D4ECD4,#B8D8B8)}
+.cat-c4{background:linear-gradient(135deg,#F8E8D4,#F0D4B8)}
+.cat-c5{background:linear-gradient(135deg,#E8D4F8,#D8B8F0)}
+.cat-label{font-size:.8rem;font-weight:500;color:var(--text)}
+
+/* ── PROMO BANNERS ── */
+.promos{display:grid;grid-template-columns:1fr 1fr 1fr;gap:1.5rem;padding:2rem 3rem;background:white}
+.promo-card{border-radius:var(--r-lg);overflow:hidden;cursor:pointer;transition:transform .25s}
+.promo-card:hover{transform:translateY(-4px)}
+.promo-bg{height:220px;display:flex;align-items:flex-end;justify-content:center;position:relative;padding:1.5rem}
+.pb1{background:linear-gradient(160deg,#D8D0F0 0%,#C8B8E8 100%)}
+.pb2{background:linear-gradient(160deg,#E8E8E8 0%,#D8D8D0 100%)}
+.pb3{background:linear-gradient(160deg,#FFD8DC 0%,#FFBCC4 100%)}
+.promo-emoji{font-size:5rem;position:absolute;top:50%;left:50%;transform:translate(-50%,-55%);filter:drop-shadow(0 8px 16px rgba(0,0,0,.15))}
+.promo-info{background:white;padding:1rem 1.2rem}
+.promo-title{font-family:'Playfair Display',serif;font-size:1rem;font-weight:600;color:var(--dark);margin-bottom:.2rem}
+.promo-sub{font-size:.75rem;color:var(--muted);margin-bottom:.7rem}
+
+/* ── TRUST ── */
+.trust{display:grid;grid-template-columns:repeat(4,1fr);gap:1rem;padding:2.5rem 3rem;background:var(--cream)}
+.trust-item{text-align:center;padding:1.5rem 1rem}
+.trust-icon{font-size:2rem;margin-bottom:.75rem;display:block}
+.trust-title{font-size:.85rem;font-weight:600;color:var(--coral);margin-bottom:.3rem}
+.trust-desc{font-size:.75rem;color:var(--muted);line-height:1.6}
+
+/* ── DEAL OF THE DAY ── */
+.deal{display:grid;grid-template-columns:1fr 1fr;min-height:320px}
+.deal-visual{background:var(--lavender);display:flex;align-items:center;justify-content:center;position:relative;overflow:hidden;padding:3rem}
+.deal-visual::before{content:'';position:absolute;inset:0;background:radial-gradient(circle at 40% 60%,rgba(255,255,255,.4) 0%,transparent 65%)}
+.deal-product{font-size:9rem;filter:drop-shadow(0 16px 32px rgba(0,0,0,.15));position:relative;z-index:1;animation:dealFloat 3s ease-in-out infinite}
+@keyframes dealFloat{0%,100%{transform:translateY(0)}50%{transform:translateY(-12px)}}
+.save-badge{position:absolute;top:2.5rem;left:2.5rem;background:var(--coral);color:white;border-radius:50%;width:64px;height:64px;display:flex;flex-direction:column;align-items:center;justify-content:center;font-size:.65rem;font-weight:700;z-index:2;box-shadow:0 4px 12px rgba(232,96,74,.4)}
+.save-badge .amount{font-size:1rem;font-weight:800;line-height:1}
+.deal-content{background:var(--warm);padding:4rem 3rem;display:flex;flex-direction:column;justify-content:center}
+.deal-tag{font-size:.68rem;font-weight:700;letter-spacing:.2em;text-transform:uppercase;color:var(--coral);margin-bottom:.75rem}
+.deal-title{font-family:'Playfair Display',serif;font-size:clamp(1.6rem,2.5vw,2.2rem);font-weight:600;color:var(--dark);margin-bottom:1.2rem;line-height:1.25}
+.countdown{display:flex;align-items:center;gap:.5rem;margin-bottom:1.5rem}
+.cd-block{text-align:center;background:white;border-radius:var(--r);padding:.5rem .75rem;min-width:52px;box-shadow:0 2px 8px rgba(0,0,0,.06)}
+.cd-num{font-family:'Playfair Display',serif;font-size:1.4rem;font-weight:700;color:var(--dark);line-height:1}
+.cd-label{font-size:.55rem;color:var(--muted);font-weight:600;letter-spacing:.08em;text-transform:uppercase;margin-top:.2rem}
+.cd-sep{font-size:1.4rem;font-weight:700;color:var(--muted);line-height:1.2}
+.deal-price{font-size:1.1rem;font-weight:600;color:var(--dark);margin-bottom:.3rem}
+.deal-price s{color:var(--muted);font-weight:400;font-size:.9rem}
+.deal-tagline{font-size:.72rem;color:var(--muted);letter-spacing:.1em;text-transform:uppercase;margin-top:1rem;line-height:1.8}
+
+/* ── FEATURED ── */
+.featured{padding:3.5rem 3rem;background:white}
+.feat-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:2rem}
+.feat-link{font-size:.8rem;font-weight:600;color:var(--coral);text-decoration:none;letter-spacing:.05em;text-transform:uppercase}
+.feat-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:1.5rem}
+.feat-hero-card{background:var(--pink);border-radius:var(--r-lg);padding:2rem;display:flex;flex-direction:column;justify-content:flex-end;position:relative;overflow:hidden;min-height:280px}
+.feat-hero-emoji{position:absolute;bottom:0;right:0;font-size:7rem;opacity:.9;filter:drop-shadow(0 8px 16px rgba(0,0,0,.1))}
+.feat-hero-badge{font-size:.7rem;font-weight:700;color:var(--coral);letter-spacing:.1em;text-transform:uppercase;margin-bottom:.4rem}
+.feat-hero-title{font-family:'Playfair Display',serif;font-size:1.3rem;font-weight:600;color:var(--dark);margin-bottom:1rem;line-height:1.3;max-width:180px}
+.feat-products{display:flex;flex-direction:column;gap:1.5rem}
+
+/* ── NEWSLETTER ── */
+.newsletter{padding:4rem 3rem;background:linear-gradient(135deg,var(--lavender) 0%,var(--pink) 100%);text-align:center}
+.newsletter h2{font-family:'Playfair Display',serif;font-size:1.8rem;font-weight:600;color:var(--dark);margin-bottom:.5rem}
+.newsletter p{font-size:.88rem;color:var(--muted);margin-bottom:1.5rem}
+.newsletter-form{display:flex;gap:.75rem;justify-content:center;max-width:420px;margin:0 auto}
+.newsletter-form input{flex:1;padding:.75rem 1.2rem;border:1.5px solid rgba(0,0,0,.1);border-radius:var(--r);font-family:'DM Sans',sans-serif;font-size:.85rem;background:white;color:var(--dark);outline:none}
+.newsletter-form input:focus{border-color:var(--coral)}
+
+@media(max-width:900px){
+  .hero{grid-template-columns:1fr}
+  .hero-content{padding:3rem 1.5rem 2rem}
+  .hero-image{display:none}
+  .promos{grid-template-columns:1fr;padding:1.5rem}
+  .trust{grid-template-columns:1fr 1fr;padding:2rem 1.5rem}
+  .deal{grid-template-columns:1fr}
+  .deal-visual{display:none}
+  .deal-content{padding:3rem 1.5rem}
+  .feat-grid{grid-template-columns:1fr}
+  .featured{padding:3rem 1.5rem}
+  .categories{padding:2.5rem 1.5rem}
+  .newsletter{padding:3rem 1.5rem}
+  .newsletter-form{flex-direction:column}
+  .promos{padding:1.5rem}
+}
+</style>
+</head>
+<body>
+<!-- nav injected by nav.js -->
+
+<!-- HERO -->
+<section class="hero">
+  <div class="hero-content reveal">
+    <div class="hero-tag">✦ Made with love</div>
+    <h1 class="hero-title">Defining Beauty On<br>Our Own Terms</h1>
+    <button class="btn-coral" onclick="window.location='shop.html'">SHOP NOW →</button>
+  </div>
+  <div class="hero-image">
+    <div class="product-circles">
+      <div class="pcircle pc1">🧴</div>
+      <div class="pcircle pc2">💄</div>
+      <div class="pcircle pc3">🌿</div>
+      <div class="pcircle pc4">🧪</div>
+      <div class="pcircle pc5">✨</div>
+    </div>
+  </div>
+</section>
+
+<!-- CATEGORIES -->
+<section class="categories">
+  <h2 class="section-title">Shop by Categories</h2>
+  <div class="cat-grid">
+    <a class="cat-item reveal d1" href="shop.html?cat=Makeup">
+      <div class="cat-circle cat-c1">💄<div class="cat-badge">23</div></div>
+      <span class="cat-label">Make up</span>
+    </a>
+    <a class="cat-item reveal d2" href="shop.html?cat=Bodycare">
+      <div class="cat-circle cat-c2">🧴<div class="cat-badge">16</div></div>
+      <span class="cat-label">Bodycare</span>
+    </a>
+    <a class="cat-item reveal d2" href="shop.html?cat=Skincare">
+      <div class="cat-circle cat-c3">🌿<div class="cat-badge">14</div></div>
+      <span class="cat-label">Skin care</span>
+    </a>
+    <a class="cat-item reveal d3" href="shop.html?cat=Gift">
+      <div class="cat-circle cat-c4">🎁<div class="cat-badge">42</div></div>
+      <span class="cat-label">Gifts set</span>
+    </a>
+    <a class="cat-item reveal d3" href="shop.html?cat=Hair">
+      <div class="cat-circle cat-c5">💆<div class="cat-badge">23</div></div>
+      <span class="cat-label">Hair &amp; Body</span>
+    </a>
+  </div>
+</section>
+
+<!-- PROMO BANNERS -->
+<div class="promos">
+  <div class="promo-card reveal d1">
+    <div class="promo-bg pb1"><div class="promo-emoji">💜</div></div>
+    <div class="promo-info">
+      <div class="promo-title">Buy 1 Get 1</div>
+      <div class="promo-sub">Starting at $799</div>
+      <button class="btn-outline" onclick="window.location='shop.html'">SHOP SALE</button>
+    </div>
+  </div>
+  <div class="promo-card reveal d2">
+    <div class="promo-bg pb2"><div class="promo-emoji">🧴</div></div>
+    <div class="promo-info">
+      <div class="promo-title">Save on Sets</div>
+      <div class="promo-sub">Special offer</div>
+      <button class="btn-outline" onclick="window.location='shop.html'">SHOP SALE</button>
+    </div>
+  </div>
+  <div class="promo-card reveal d3">
+    <div class="promo-bg pb3"><div class="promo-emoji">✨</div></div>
+    <div class="promo-info">
+      <div class="promo-title">Feel your Glowy</div>
+      <div class="promo-sub">Made with love</div>
+      <button class="btn-outline" onclick="window.location='shop.html'">EXPLORE NOW</button>
+    </div>
+  </div>
+</div>
+
+<!-- TRUST -->
+<div class="trust">
+  <div class="trust-item reveal d1">
+    <span class="trust-icon">🛡️</span>
+    <div class="trust-title">Safety First</div>
+    <div class="trust-desc">100% Clean, Non-Irritating,<br>Derm Tested</div>
+  </div>
+  <div class="trust-item reveal d2">
+    <span class="trust-icon">🚚</span>
+    <div class="trust-title">Free Shipping</div>
+    <div class="trust-desc">Free shipping on all U.S.<br>orders $500+</div>
+  </div>
+  <div class="trust-item reveal d2">
+    <span class="trust-icon">🐰</span>
+    <div class="trust-title">No Animal Testing</div>
+    <div class="trust-desc">Tested on human volunteers,<br>not animals.</div>
+  </div>
+  <div class="trust-item reveal d3">
+    <span class="trust-icon">🌿</span>
+    <div class="trust-title">Organic</div>
+    <div class="trust-desc">Natural &amp; organic beauty<br>products</div>
+  </div>
+</div>
+
+<!-- DEAL OF THE DAY -->
+<section class="deal">
+  <div class="deal-visual">
+    <div class="save-badge"><span style="font-size:.58rem">Save</span><span class="amount">$13</span></div>
+    <div class="deal-product">💄</div>
+  </div>
+  <div class="deal-content reveal">
+    <div class="deal-tag">✦ Deal of the Day</div>
+    <h2 class="deal-title">Get Glossed<br>Lipp Gloss</h2>
+    <div class="countdown">
+      <div class="cd-block"><div class="cd-num" id="cd-h">01</div><div class="cd-label">Hrs</div></div>
+      <div class="cd-sep">:</div>
+      <div class="cd-block"><div class="cd-num" id="cd-m">12</div><div class="cd-label">Min</div></div>
+      <div class="cd-sep">:</div>
+      <div class="cd-block"><div class="cd-num" id="cd-s">37</div><div class="cd-label">Sec</div></div>
+    </div>
+    <div class="deal-price"><s>$42.00</s> &nbsp;<span style="color:var(--coral);font-size:1.2rem">$29.00</span></div>
+    <button class="btn-coral" style="margin-top:1rem" onclick="Cart.add(0,'30 ml');showAddedFeedback(this)">GET ONLY $29.00</button>
+    <div class="deal-tagline">No cakiness. No harsh lines. Just beautiful,<br>sun-kissed skin. Lucky you.</div>
+  </div>
+</section>
+
+<!-- FEATURED PRODUCTS -->
+<section class="featured">
+  <div class="feat-header">
+    <h2 class="section-title" style="margin:0">Featured Products</h2>
+    <a href="shop.html" class="feat-link">View All →</a>
+  </div>
+  <div class="feat-grid">
+    <div class="feat-hero-card reveal d1">
+      <div class="feat-hero-badge">✦ Customer Favorite</div>
+      <div class="feat-hero-title">Antioxidants PM Facial Oil</div>
+      <button class="btn-coral" style="width:fit-content;font-size:.78rem;padding:.6rem 1.4rem" onclick="window.location='shop.html'">SHOP NOW</button>
+      <div class="feat-hero-emoji">🧴</div>
+    </div>
+    <div class="feat-products">
+      <div class="product-card reveal d2" onclick="window.location='product.html?id=0'">
+        <div class="product-img product-img-lavender">
+          <div class="product-badge badge-new">New</div>💄
+        </div>
+        <div class="product-info">
+          <div class="product-name">Skindex Cream Blush</div>
+          <div class="product-stars">★★★★★ <span>2,687 reviews</span></div>
+          <div class="product-price"><span class="price-old">$39.00</span><span class="price-new">$29.00</span></div>
+          <button class="btn-add" onclick="event.stopPropagation();Cart.add(0,'30 ml');showAddedFeedback(this)">Add to Bag</button>
+        </div>
+      </div>
+    </div>
+    <div class="feat-products">
+      <div class="product-card reveal d3" onclick="window.location='product.html?id=2'">
+        <div class="product-img product-img-pink">
+          <div class="product-badge badge-hot">Hot</div>🫙
+        </div>
+        <div class="product-info">
+          <div class="product-name">Holy Grail Cream Blush</div>
+          <div class="product-stars">★★★★★ <span>4,287 reviews</span></div>
+          <div class="product-price"><span class="price-old">$39.00</span><span class="price-new">$29.00</span></div>
+          <button class="btn-add" onclick="event.stopPropagation();Cart.add(2,'30 ml');showAddedFeedback(this)">Choose Color</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- NEWSLETTER -->
+<section class="newsletter">
+  <h2>Get 10% Off Your First Order</h2>
+  <p>Subscribe to our newsletter for exclusive offers, beauty tips &amp; more</p>
+  <div class="newsletter-form">
+    <input type="email" placeholder="Enter your email address">
+    <button class="btn-coral" onclick="handleNewsletter(this)">Subscribe</button>
+  </div>
+</section>
+
+<!-- footer injected by nav.js -->
+
+<script src="store.js"></script>
+<script>
+  window.SKINDEX_PAGE = 'home';
+</script>
+<script src="nav.js"></script>
+<script>
+  // Countdown timer
+  const end = Date.now() + (1*3600+12*60+37)*1000;
+  function tick(){
+    const rem = Math.max(0, end - Date.now());
+    document.getElementById('cd-h').textContent = String(Math.floor(rem/3600000)).padStart(2,'0');
+    document.getElementById('cd-m').textContent = String(Math.floor((rem%3600000)/60000)).padStart(2,'0');
+    document.getElementById('cd-s').textContent = String(Math.floor((rem%60000)/1000)).padStart(2,'0');
+  }
+  setInterval(tick, 1000); tick();
+
+  function handleNewsletter(btn){
+    const input = btn.previousElementSibling;
+    if(!input.value.includes('@')){ input.style.borderColor='var(--coral)'; return; }
+    btn.textContent = '✓ Subscribed!';
+    btn.style.background = '#4CAF90';
+    input.value = '';
+  }
+</script>
+</body>
+</html>
