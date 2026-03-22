@@ -225,10 +225,24 @@
 <body>
 <script>window.SKINDEX_PAGE='account';</script>
 
-<div class="acc-wrap">
+<!-- Loading overlay - shown while checking session -->
+<div id="auth-loading" style="
+  min-height:60vh;display:flex;align-items:center;justify-content:center;
+  flex-direction:column;gap:1rem;
+">
+  <div style="
+    width:40px;height:40px;border-radius:50%;
+    border:3px solid #E8E4F3;border-top-color:var(--coral);
+    animation:spin .7s linear infinite;
+  "></div>
+  <div style="font-size:.82rem;color:var(--muted)">Loading...</div>
+</div>
+<style>@keyframes spin{to{transform:rotate(360deg)}}</style>
+
+<div class="acc-wrap" style="display:none" id="acc-main">
 
   <!-- ── AUTH VIEW (shown when logged out) ── -->
-  <div id="view-auth">
+  <div id="view-auth" style="display:none">
     <div class="acc-tabs">
       <button class="acc-tab active" onclick="switchAuthTab('login',this)">Sign In</button>
       <button class="acc-tab" onclick="switchAuthTab('register',this)">Create Account</button>
@@ -497,11 +511,14 @@ async function initAuth() {
 
 /* Listen for auth state changes */
 sb.auth.onAuthStateChange(async (event, session) => {
-  if (event === 'SIGNED_IN' && session) {
+  console.log('Auth event:', event, session ? 'has session' : 'no session');
+  if ((event === 'SIGNED_IN' || event === 'TOKEN_REFRESHED') && session) {
     await loadProfile(session.user);
     showProfileView();
   } else if (event === 'SIGNED_OUT') {
     showAuthView();
+  } else if (event === 'INITIAL_SESSION') {
+    /* handled by initAuth() already — skip to avoid double render */
   }
 });
 
@@ -591,9 +608,23 @@ async function handleGoogleAuth() {
 
 /* ── LOGOUT ── */
 async function handleLogout() {
-  await sb.auth.signOut();
+  const btn = document.querySelector('.pnav-item:last-child');
+  if (btn) { btn.textContent = 'Signing out...'; btn.disabled = true; }
+
+  const { error } = await sb.auth.signOut();
+
+  if (error) {
+    showToast('Error signing out: ' + error.message);
+    if (btn) { btn.innerHTML = SVG_LOGOUT + ' Sign Out'; btn.disabled = false; }
+    return;
+  }
+
   showToast('Signed out successfully.');
+  /* onAuthStateChange จะ call showAuthView() อัตโนมัติ */
 }
+
+/* SVG สำหรับ logout icon */
+const SVG_LOGOUT = '<svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>';
 
 /* ── FORGOT PASSWORD ── */
 async function showForgot() {
@@ -836,11 +867,15 @@ function reorder(items) {
 ══════════════════════════════════════════ */
 
 function showAuthView() {
-  document.getElementById('view-auth').style.display = 'block';
+  document.getElementById('auth-loading').style.display = 'none';
+  document.getElementById('acc-main').style.display     = 'block';
+  document.getElementById('view-auth').style.display    = 'block';
   document.getElementById('view-profile').style.display = 'none';
 }
 function showProfileView() {
-  document.getElementById('view-auth').style.display = 'none';
+  document.getElementById('auth-loading').style.display = 'none';
+  document.getElementById('acc-main').style.display     = 'block';
+  document.getElementById('view-auth').style.display    = 'none';
   document.getElementById('view-profile').style.display = 'block';
 }
 
