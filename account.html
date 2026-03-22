@@ -751,11 +751,11 @@ async function loadProfile(user) {
   const email = user.email;
 
   /* ── Try profiles table first, fallback to user_metadata ── */
-  let fname = '', lname = '', phone = '', profileEmail = '';
+  let fname = '', lname = '', phone = '', profileEmail = '', avatarUrl = null;
   try {
     const { data: profile, error: profileErr } = await sb
       .from('profiles')
-      .select('first_name, last_name, phone, email')
+      .select('first_name, last_name, phone, email, avatar_url')
       .eq('id', user.id)
       .maybeSingle();
 
@@ -766,6 +766,7 @@ async function loadProfile(user) {
       lname        = profile.last_name  || meta.last_name  || '';
       phone        = profile.phone      || meta.phone      || '';
       profileEmail = profile.email      || user.email      || '';
+      avatarUrl    = profile.avatar_url || null;
     } else {
       /* profile row ยังไม่มี — สร้างให้เลย */
       fname        = meta.first_name || '';
@@ -789,7 +790,7 @@ async function loadProfile(user) {
 
   document.getElementById('profile-name-display').textContent = name;
   document.getElementById('profile-email-display').textContent = displayEmail;
-  setAvatar(profile ? profile.avatar_url : null, initials);
+  setAvatar(avatarUrl, initials);
 
   document.getElementById('edit-fname').value  = fname;
   document.getElementById('edit-lname').value  = lname;
