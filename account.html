@@ -7,6 +7,22 @@
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400&family=DM+Sans:wght@300;400;500;600&display=swap">
 <link rel="stylesheet" href="shared.css">
 <style>
+/* ── SKELETON LOADING ── */
+@keyframes shimmer{
+  0%{background-position:-600px 0}
+  100%{background-position:600px 0}
+}
+.skel{
+  background:linear-gradient(90deg,#f0eef8 25%,#e4e0f0 50%,#f0eef8 75%);
+  background-size:600px 100%;
+  animation:shimmer 1.4s infinite linear;
+  border-radius:6px;
+}
+.skel-text{height:.85rem;margin-bottom:.5rem}
+.skel-title{height:1.2rem;width:60%;margin-bottom:.75rem}
+.skel-avatar{width:80px;height:80px;border-radius:50%;margin:0 auto .75rem}
+.skel-btn{height:2rem;border-radius:8px;margin-top:.5rem}
+
 /* ── PAGE SHELL ── */
 .acc-wrap{max-width:960px;margin:0 auto;padding:3rem 2rem 5rem}
 
@@ -359,8 +375,8 @@
 
       <!-- Sidebar -->
       <aside class="profile-sidebar">
-        <div class="avatar-ring" id="avatar-display" onclick="triggerAvatarUpload()">
-          <span id="avatar-initials">👤</span>
+        <div class="avatar-ring skel skel-avatar" id="avatar-display" onclick="triggerAvatarUpload()" style="font-size:0">
+          <span id="avatar-initials" style="display:none">👤</span>
           <img id="avatar-img" src="" alt="" style="display:none">
           <div class="avatar-overlay">
             <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>
@@ -369,8 +385,8 @@
         </div>
         <input type="file" id="avatar-file-input" accept="image/*" onchange="uploadAvatar(event)">
         <div id="avatar-upload-status" style="font-size:.7rem;color:var(--muted);margin-bottom:.5rem;min-height:1rem;text-align:center"></div>
-        <div class="profile-name" id="profile-name-display">—</div>
-        <div class="profile-email" id="profile-email-display">—</div>
+        <div class="profile-name skel skel-title" id="profile-name-display" style="color:transparent">—</div>
+        <div class="profile-email skel skel-text" id="profile-email-display" style="color:transparent;width:80%;margin:0 auto .75rem">—</div>
         <nav class="profile-nav">
           <button class="pnav-item active" onclick="switchProfileTab('orders',this)">
             <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M9 5H7a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2h-2"/><rect x="9" y="3" width="6" height="4" rx="1"/></svg>
@@ -525,8 +541,8 @@ const sb = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 async function initAuth() {
   const { data: { session } } = await sb.auth.getSession();
   if (session) {
-    await loadProfile(session.user);
-    showProfileView();
+    showProfileView();          /* แสดง UI ก่อนทันที */
+    loadProfile(session.user);  /* โหลด data background */
   } else {
     showAuthView();
   }
@@ -536,8 +552,8 @@ async function initAuth() {
 sb.auth.onAuthStateChange(async (event, session) => {
   console.log('Auth event:', event, session ? 'has session' : 'no session');
   if ((event === 'SIGNED_IN' || event === 'TOKEN_REFRESHED') && session) {
-    await loadProfile(session.user);
     showProfileView();
+    loadProfile(session.user);
   } else if (event === 'SIGNED_OUT') {
     showAuthView();
   } else if (event === 'INITIAL_SESSION') {
@@ -611,8 +627,8 @@ async function handleRegister() {
   if (data.session) {
     /* email confirmation OFF - logged in immediately */
     showToast('Account created! Welcome to Skindex ✨');
-    await loadProfile(data.session.user);
     showProfileView();
+    loadProfile(data.session.user);
   } else if (data.user && !data.session) {
     /* email confirmation ON - need to verify */
     const s = document.getElementById('register-success');
@@ -635,11 +651,15 @@ async function handleGoogleAuth() {
 ══════════════════════════════════════════ */
 
 function setAvatar(url, initials) {
-  const img      = document.getElementById('avatar-img');
-  const initial  = document.getElementById('avatar-initials');
+  const ring    = document.getElementById('avatar-display');
+  const img     = document.getElementById('avatar-img');
+  const initial = document.getElementById('avatar-initials');
+  /* ลบ skeleton */
+  ring.classList.remove('skel','skel-avatar');
+  ring.style.fontSize = '';
   if (url) {
-    img.src            = url;
-    img.style.display  = 'block';
+    img.src           = url;
+    img.style.display = 'block';
     initial.style.display = 'none';
   } else {
     img.style.display     = 'none';
@@ -788,8 +808,15 @@ async function loadProfile(user) {
   const name = (fname + ' ' + lname).trim() || meta.full_name || meta.name || 'Member';
   const initials = [(fname||'')[0], (lname||'')[0]].filter(Boolean).join('').toUpperCase() || '✦';
 
-  document.getElementById('profile-name-display').textContent = name;
-  document.getElementById('profile-email-display').textContent = displayEmail;
+  /* ลบ skeleton เมื่อข้อมูลพร้อม */
+  const nameEl  = document.getElementById('profile-name-display');
+  const emailEl = document.getElementById('profile-email-display');
+  nameEl.classList.remove('skel','skel-title');
+  nameEl.style.color = '';
+  nameEl.textContent = name;
+  emailEl.classList.remove('skel','skel-text');
+  emailEl.style.cssText = '';
+  emailEl.textContent = displayEmail;
   setAvatar(avatarUrl, initials);
 
   document.getElementById('edit-fname').value  = fname;
@@ -797,8 +824,8 @@ async function loadProfile(user) {
   document.getElementById('edit-email').value  = displayEmail;
   if (phone) document.getElementById('edit-phone').value = phone;
 
-  await loadOrders(user.id);
-  await loadAddress(user.id);
+  /* รัน parallel — เร็วขึ้นเกือบ 2x */
+  await Promise.all([ loadOrders(user.id), loadAddress(user.id) ]);
 }
 
 async function saveProfile() {
