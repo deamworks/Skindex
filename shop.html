@@ -188,13 +188,23 @@
     grid.innerHTML = items.map(p=>productCardHTML(p)).join('');
   }
 
-  // Read URL param on load
-  const urlCat = new URLSearchParams(location.search).get('cat');
-  if(urlCat){
-    const matchEl = document.querySelector(`[data-cat="${urlCat}"]`);
-    if(matchEl){ setFilter('cat', matchEl); }
-  }
-  renderGrid();
+  /* รอ products โหลดจาก Supabase ก่อน */
+  onProductsReady(function(products) {
+    // Read URL param on load
+    const urlCat = new URLSearchParams(location.search).get('cat');
+    if(urlCat){
+      const matchEl = document.querySelector('[data-cat="'+urlCat+'"]');
+      if(matchEl){ setFilter('cat', matchEl); }
+    }
+    // also handle ?q= search param
+    const urlQ = new URLSearchParams(location.search).get('q');
+    if(urlQ){
+      const searchInput = document.getElementById('priceMin');
+      // highlight search in title
+      document.querySelector('.shop-head h1').textContent = 'Results: "' + urlQ + '"';
+    }
+    renderGrid();
+  });
 </script>
 </body>
 </html>
