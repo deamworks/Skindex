@@ -54,8 +54,8 @@ html,body{height:100%;font-family:'DM Sans',sans-serif;background:var(--bg);colo
 .auth-err{font-size:.78rem;color:var(--red);text-align:center;margin-top:.75rem;display:none}
 
 /* ── LAYOUT ── */
-#admin-app{display:none;height:100vh;display:none;flex-direction:column}
-#admin-app.ready{display:flex}
+#admin-app{height:100vh;flex-direction:column;display:none}
+#admin-app.ready{display:flex!important}
 
 .admin-topbar{
   background:var(--dark);color:white;height:56px;
@@ -572,7 +572,7 @@ const SUPABASE_URL = 'https://qjmabovxjcabpveahfge.supabase.co';
 const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InFqbWFib3Z4amNhYnB2ZWFoZmdlIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQxODcwMzgsImV4cCI6MjA4OTc2MzAzOH0.ypzU22gs9qQZcCsyinhljXdqfnEWiogt3Mc1AHsq_F8';
 const sb = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
-const ADMIN_EMAILS = ['putita3088@gmail.com']; // เพิ่ม email admin ตรงนี้
+const ADMIN_EMAILS = ['putita3088@gmail.com', 'pddeam1230@gmail.com']; // เพิ่ม email admin ตรงนี้
 
 let allProducts = [];
 let deleteTargetId = null;
@@ -584,14 +584,59 @@ async function adminLogin() {
   const email = document.getElementById('g-email').value.trim();
   const pass  = document.getElementById('g-pass').value;
   const errEl = document.getElementById('auth-err');
+  const btn   = document.querySelector('.btn-login');
   errEl.style.display = 'none';
 
-  const { data, error } = await sb.auth.signInWithPassword({ email, password: pass });
-  if (error) { errEl.textContent = error.message; errEl.style.display = 'block'; return; }
+  if (!email || !pass) {
+    errEl.textContent = 'Please enter email and password.';
+    errEl.style.display = 'block'; return;
+  }
 
-  if (!ADMIN_EMAILS.includes(email)) {
+  btn.textContent = 'Signing in...';
+  btn.disabled = true;
+
+  const { data, error } = await sb.auth.signInWithPassword({ email, password: pass });
+
+  btn.textContent = 'Sign In to Admin';
+  btn.disabled = false;
+
+  if (error) {
+    console.error('Supabase auth error:', error);
+    /* แปล error message ให้เข้าใจง่าย */
+    let msg = error.message;
+    if (msg.includes('Invalid login credentials'))
+      msg = 'Email or password incorrect. Please try again.';
+    else if (msg.includes('Email not confirmed'))
+      msg = 'Please confirm your email first, then try again. (Check your inbox)';
+    else if (msg.includes('Too many requests'))
+      msg = 'Too many attempts. Please wait a few minutes.';
+    errEl.textContent = msg;
+    errEl.style.display = 'block';
+    return;
+  }
+
+  console.log('Login OK, user:', data.user.email);
+
+  /* เช็คจาก DB ก่อน ถ้า hardcode list ก็ผ่าน */
+  let isAdmin = ADMIN_EMAILS.includes(email);
+
+  if (!isAdmin) {
+    /* เช็ค is_admin จาก profiles table */
+    try {
+      const { data: profile } = await sb
+        .from('profiles')
+        .select('is_admin')
+        .eq('id', data.user.id)
+        .maybeSingle();
+      isAdmin = profile && profile.is_admin === true;
+    } catch(e) {
+      console.warn('Could not check is_admin:', e);
+    }
+  }
+
+  if (!isAdmin) {
     await sb.auth.signOut();
-    errEl.textContent = 'Access denied. Admin only.';
+    errEl.textContent = 'Access denied. This account is not an admin.';
     errEl.style.display = 'block';
     return;
   }
@@ -600,20 +645,39 @@ async function adminLogin() {
 
 async function adminLogout() {
   await sb.auth.signOut();
-  document.getElementById('admin-app').classList.remove('ready');
+  const app = document.getElementById('admin-app');
+  app.classList.remove('ready');
+  app.style.display = 'none';
   document.getElementById('auth-gate').style.display = 'flex';
 }
 
 async function checkSession() {
   const { data: { session } } = await sb.auth.getSession();
-  if (session && ADMIN_EMAILS.includes(session.user.email)) {
-    showApp(session.user.email);
+  if (!session) return;
+
+  const email = session.user.email;
+  let isAdmin = ADMIN_EMAILS.includes(email);
+
+  if (!isAdmin) {
+    try {
+      const { data: profile } = await sb
+        .from('profiles')
+        .select('is_admin')
+        .eq('id', session.user.id)
+        .maybeSingle();
+      isAdmin = profile && profile.is_admin === true;
+    } catch(e) {}
   }
+
+  if (isAdmin) showApp(email);
 }
 
 function showApp(email) {
-  document.getElementById('auth-gate').style.display = 'none';
-  document.getElementById('admin-app').classList.add('ready');
+  const gate = document.getElementById('auth-gate');
+  const app  = document.getElementById('admin-app');
+  gate.style.display = 'none';
+  app.classList.add('ready');
+  app.style.display  = 'flex';   /* force override */
   document.getElementById('admin-user-email').textContent = email;
   loadProducts();
 }
