@@ -237,6 +237,7 @@
   .acc-tab{padding:.75rem .85rem;font-size:.72rem}
 }
 </style>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
 <body>
 <script>window.SKINDEX_PAGE='account';</script>
@@ -509,13 +510,20 @@
      Replace these values with your own from:
      https://supabase.com → Project Settings → API
 ═══════════════════════════════════════════ -->
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script>
-/* ── CONFIG — replace with your Supabase project values ── */
+document.addEventListener('DOMContentLoaded', function() {
+
+/* ── CONFIG ── */
 const SUPABASE_URL = 'https://qjmabovxjcabpveahfge.supabase.co';
 const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InFqbWFib3Z4amNhYnB2ZWFoZmdlIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQxODcwMzgsImV4cCI6MjA4OTc2MzAzOH0.ypzU22gs9qQZcCsyinhljXdqfnEWiogt3Mc1AHsq_F8';
 
-/* ── Init Supabase client ── */
+/* ── Init Supabase ── */
+if (typeof supabase === 'undefined') {
+  console.error('Supabase SDK not loaded!');
+  document.getElementById('auth-loading').innerHTML =
+    '<p style="color:var(--coral);font-size:.88rem;text-align:center;padding:2rem">Connection error.<br>Please refresh the page.</p>';
+  return;
+}
 const { createClient } = supabase;
 const sb = createClient(SUPABASE_URL, SUPABASE_KEY);
 
@@ -1025,6 +1033,8 @@ function showToast(msg) {
 
 /* ── KICK OFF ── */
 initAuth();
+
+}); // end DOMContentLoaded
 </script>
 </body>
 </html>
