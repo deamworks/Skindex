@@ -582,9 +582,14 @@ async function handleLogin() {
   setLoading('btn-login', 'login-spinner', false);
 
   if (error) {
-    errEl.textContent = error.message === 'Invalid login credentials'
-      ? 'Incorrect email or password. Please try again.'
-      : error.message;
+    let msg = error.message;
+    if (msg.includes('Invalid login credentials'))
+      msg = 'Incorrect email or password. Please try again.';
+    else if (msg.includes('Email not confirmed'))
+      msg = 'Please confirm your email first. Check your inbox for a confirmation link.';
+    else if (msg.includes('Too many requests'))
+      msg = 'Too many attempts. Please wait a few minutes and try again.';
+    errEl.textContent = msg;
     errEl.style.display = 'block';
     return;
   }
@@ -625,15 +630,25 @@ async function handleRegister() {
   }
 
   if (data.session) {
-    /* email confirmation OFF - logged in immediately */
+    /* email confirmation OFF — เข้าได้ทันที */
     showToast('Account created! Welcome to Skindex ✨');
     showProfileView();
     loadProfile(data.session.user);
+
   } else if (data.user && !data.session) {
-    /* email confirmation ON - need to verify */
-    const s = document.getElementById('register-success');
-    s.textContent = '✉️ Check your email to confirm your account, then come back to sign in!';
-    s.style.display = 'block';
+    /* email confirmation ยังเปิดอยู่ — ลอง sign in ซ้ำ */
+    /* บางครั้ง Supabase ส่ง session ช้า ลองดึงซ้ำ */
+    const { data: d2, error: e2 } = await sb.auth.signInWithPassword({ email, password: pass });
+    if (!e2 && d2.session) {
+      showToast('Account created! Welcome to Skindex ✨');
+      showProfileView();
+      loadProfile(d2.session.user);
+    } else {
+      /* ยืนยัน email จริงๆ */
+      const s = document.getElementById('register-success');
+      s.innerHTML = '✉️ Please check your inbox and click the confirmation link, then come back to <a onclick="switchAuthTab(\'login\',document.querySelectorAll(\'.acc-tab\')[0])" style="color:var(--coral);cursor:pointer;font-weight:600">Sign In</a>';
+      s.style.display = 'block';
+    }
   }
 }
 
