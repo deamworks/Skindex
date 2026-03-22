@@ -85,7 +85,7 @@
 .opt-card.selected .opt-check{background:var(--coral);border-color:var(--coral)}
 .opt-card.selected .opt-check::after{content:'✓';font-size:.65rem;color:white;font-weight:800}
 .opt-emoji{font-size:1.75rem;flex-shrink:0;line-height:1}
-.opt-text{}
+.opt-text{display:flex;flex-direction:column}
 .opt-label{font-size:.88rem;font-weight:600;color:var(--dark)}
 .opt-desc{font-size:.75rem;color:var(--muted);margin-top:.1rem;line-height:1.4}
 .opt-check{
@@ -184,7 +184,7 @@
   background:var(--coral);color:white;font-size:.75rem;font-weight:800;
   display:flex;align-items:center;justify-content:center;flex-shrink:0;
 }
-.step-info{}
+.step-info{flex:1}
 .step-time{font-size:.65rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--muted)}
 .step-name{font-size:.85rem;font-weight:600;color:var(--dark)}
 
