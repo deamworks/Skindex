@@ -511,21 +511,11 @@
      https://supabase.com → Project Settings → API
 ═══════════════════════════════════════════ -->
 <script>
-document.addEventListener('DOMContentLoaded', function() {
-
-/* ── CONFIG ── */
 const SUPABASE_URL = 'https://qjmabovxjcabpveahfge.supabase.co';
 const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InFqbWFib3Z4amNhYnB2ZWFoZmdlIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQxODcwMzgsImV4cCI6MjA4OTc2MzAzOH0.ypzU22gs9qQZcCsyinhljXdqfnEWiogt3Mc1AHsq_F8';
 
-/* ── Init Supabase ── */
-if (typeof supabase === 'undefined') {
-  console.error('Supabase SDK not loaded!');
-  document.getElementById('auth-loading').innerHTML =
-    '<p style="color:var(--coral);font-size:.88rem;text-align:center;padding:2rem">Connection error.<br>Please refresh the page.</p>';
-  return;
-}
-const { createClient } = supabase;
-const sb = createClient(SUPABASE_URL, SUPABASE_KEY);
+/* sb จะถูก init ตอน DOMContentLoaded */
+let sb = null;
 
 /* ══════════════════════════════════════════
    AUTH HELPERS
@@ -533,6 +523,15 @@ const sb = createClient(SUPABASE_URL, SUPABASE_KEY);
 
 /* Check session on page load */
 async function initAuth() {
+  /* Init Supabase ตรงนี้ — ตอนนี้ DOM + SDK พร้อมแน่นอน */
+  if (!sb) {
+    if (typeof supabase === 'undefined') {
+      document.getElementById('auth-loading').innerHTML =
+        '<p style="color:var(--coral);font-size:.88rem;text-align:center;padding:2rem">&#x26A0; Could not connect.<br>Please refresh the page.</p>';
+      return;
+    }
+    sb = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+  }
   const { data: { session } } = await sb.auth.getSession();
   if (session) {
     await loadProfile(session.user);
@@ -1034,7 +1033,7 @@ function showToast(msg) {
 /* ── KICK OFF ── */
 initAuth();
 
-}); // end DOMContentLoaded
+
 </script>
 </body>
 </html>
