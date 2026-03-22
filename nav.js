@@ -3,6 +3,7 @@
   const PAGES = {
     home:    {label:'Home',    href:'index.html'},
     shop:    {label:'Shop',    href:'shop.html'},
+    quiz:    {label:'Skin Quiz', href:'quiz.html'},
     product: {label:'Product', href:'product.html'},
     cart:    {label:'Cart',    href:'cart.html'},
     checkout:{label:'Checkout',href:'checkout.html'},

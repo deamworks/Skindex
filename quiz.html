@@ -1,0 +1,745 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Skin Quiz — Skindex</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400&family=DM+Sans:wght@300;400;500;600&display=swap">
+<link rel="stylesheet" href="shared.css">
+<style>
+/* ── QUIZ SHELL ── */
+.quiz-hero{
+  background:linear-gradient(135deg,#F9EEF6 0%,#EDE8F8 50%,#E8F3FA 100%);
+  text-align:center;padding:4rem 2rem 3rem;
+  position:relative;overflow:hidden;
+}
+.quiz-hero::before{
+  content:'';position:absolute;inset:0;
+  background:radial-gradient(ellipse at 30% 50%,rgba(232,96,74,.08) 0%,transparent 60%),
+             radial-gradient(ellipse at 70% 30%,rgba(139,124,200,.1) 0%,transparent 60%);
+}
+.quiz-hero-inner{position:relative;z-index:1;max-width:600px;margin:0 auto}
+.quiz-tag{
+  display:inline-flex;align-items:center;gap:.4rem;
+  background:white;border-radius:20px;padding:.35rem .9rem;
+  font-size:.72rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;
+  color:var(--coral);box-shadow:0 2px 12px rgba(0,0,0,.08);margin-bottom:1.25rem;
+}
+.quiz-hero h1{
+  font-family:'Playfair Display',serif;
+  font-size:clamp(2rem,4vw,3rem);font-weight:700;
+  color:var(--dark);line-height:1.2;margin-bottom:.75rem;
+}
+.quiz-hero h1 em{font-style:italic;color:var(--coral)}
+.quiz-hero p{font-size:.9rem;color:var(--muted);line-height:1.8;margin-bottom:2rem}
+.quiz-meta{display:flex;align-items:center;justify-content:center;gap:2rem;flex-wrap:wrap}
+.quiz-meta-item{display:flex;align-items:center;gap:.4rem;font-size:.78rem;color:var(--muted)}
+
+/* ── PROGRESS ── */
+.progress-wrap{max-width:600px;margin:0 auto;padding:2rem 1.5rem 0}
+.progress-bar-track{
+  height:6px;background:#EDE8F5;border-radius:3px;
+  overflow:hidden;margin-bottom:.6rem;
+}
+.progress-bar-fill{
+  height:100%;background:linear-gradient(90deg,var(--coral),#C44835);
+  border-radius:3px;transition:width .5s cubic-bezier(.4,0,.2,1);
+}
+.progress-labels{display:flex;justify-content:space-between;font-size:.72rem;color:var(--muted)}
+
+/* ── QUESTION CARD ── */
+.quiz-wrap{max-width:680px;margin:0 auto;padding:2rem 1.5rem 4rem}
+.question-card{
+  background:white;border-radius:24px;
+  box-shadow:0 4px 32px rgba(139,124,200,.12);
+  padding:2.5rem;
+  animation:slideIn .4s cubic-bezier(.4,0,.2,1);
+}
+@keyframes slideIn{
+  from{opacity:0;transform:translateY(20px)}
+  to{opacity:1;transform:translateY(0)}
+}
+.q-step{font-size:.7rem;font-weight:700;letter-spacing:.15em;text-transform:uppercase;color:var(--coral);margin-bottom:.6rem}
+.q-title{font-family:'Playfair Display',serif;font-size:1.5rem;font-weight:700;color:var(--dark);margin-bottom:.4rem;line-height:1.3}
+.q-sub{font-size:.85rem;color:var(--muted);margin-bottom:2rem;line-height:1.6}
+.q-multi-hint{font-size:.75rem;color:var(--lavender-deep);margin-bottom:1.25rem;font-style:italic}
+
+/* ── OPTIONS ── */
+.options-grid{display:grid;gap:.75rem}
+.options-grid.cols-2{grid-template-columns:1fr 1fr}
+.options-grid.cols-3{grid-template-columns:1fr 1fr 1fr}
+
+.opt-card{
+  border:2px solid #EDE8F5;border-radius:14px;
+  padding:1.1rem 1.25rem;cursor:pointer;
+  transition:all .2s cubic-bezier(.4,0,.2,1);
+  display:flex;align-items:center;gap:.85rem;
+  background:white;text-align:left;width:100%;
+  font-family:'DM Sans',sans-serif;
+}
+.opt-card:hover{border-color:var(--coral);background:#FFF8F7;transform:translateY(-2px)}
+.opt-card.selected{
+  border-color:var(--coral);background:linear-gradient(135deg,#FFF5F3,#FFF0EE);
+  box-shadow:0 4px 16px rgba(232,96,74,.15);
+}
+.opt-card.selected .opt-check{background:var(--coral);border-color:var(--coral)}
+.opt-card.selected .opt-check::after{content:'✓';font-size:.65rem;color:white;font-weight:800}
+.opt-emoji{font-size:1.75rem;flex-shrink:0;line-height:1}
+.opt-text{}
+.opt-label{font-size:.88rem;font-weight:600;color:var(--dark)}
+.opt-desc{font-size:.75rem;color:var(--muted);margin-top:.1rem;line-height:1.4}
+.opt-check{
+  width:20px;height:20px;border-radius:50%;border:2px solid #DDD;
+  display:flex;align-items:center;justify-content:center;
+  flex-shrink:0;margin-left:auto;transition:all .2s;
+}
+
+/* ── NAV BUTTONS ── */
+.quiz-nav{display:flex;align-items:center;justify-content:space-between;margin-top:2rem;gap:1rem}
+.btn-prev{
+  display:flex;align-items:center;gap:.4rem;
+  background:none;border:1.5px solid #DDD;color:var(--muted);
+  border-radius:10px;padding:.72rem 1.25rem;
+  font-family:'DM Sans',sans-serif;font-size:.85rem;font-weight:500;
+  cursor:pointer;transition:all .2s;
+}
+.btn-prev:hover{border-color:var(--dark);color:var(--dark)}
+.btn-next{
+  display:flex;align-items:center;gap:.5rem;
+  background:var(--coral);color:white;border:none;
+  border-radius:10px;padding:.78rem 1.75rem;flex:1;justify-content:center;
+  font-family:'DM Sans',sans-serif;font-size:.88rem;font-weight:700;
+  cursor:pointer;transition:all .25s;letter-spacing:.04em;
+}
+.btn-next:hover{background:#C44835;transform:translateY(-1px);box-shadow:0 6px 20px rgba(232,96,74,.3)}
+.btn-next:disabled{opacity:.4;cursor:not-allowed;transform:none;box-shadow:none}
+
+/* ── RESULTS ── */
+.results-wrap{max-width:900px;margin:0 auto;padding:2rem 1.5rem 5rem;display:none}
+.results-hero{
+  text-align:center;padding:3rem 1rem 2.5rem;
+  background:linear-gradient(135deg,#FFF5F3,#F0EEF8);
+  border-radius:24px;margin-bottom:2.5rem;
+}
+.results-hero .icon{font-size:3.5rem;margin-bottom:1rem}
+.results-hero h2{font-family:'Playfair Display',serif;font-size:1.8rem;color:var(--dark);margin-bottom:.5rem}
+.results-hero p{font-size:.9rem;color:var(--muted);line-height:1.7;max-width:500px;margin:0 auto 1.5rem}
+.skin-type-badge{
+  display:inline-flex;align-items:center;gap:.5rem;
+  background:white;border-radius:20px;padding:.5rem 1.25rem;
+  font-size:.82rem;font-weight:700;color:var(--coral);
+  box-shadow:0 2px 12px rgba(0,0,0,.08);
+}
+
+.results-section-title{
+  font-family:'Playfair Display',serif;font-size:1.25rem;color:var(--dark);
+  margin-bottom:1.25rem;display:flex;align-items:center;gap:.6rem;
+}
+.rec-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:1.25rem;margin-bottom:2.5rem}
+
+.rec-card{
+  background:white;border-radius:18px;overflow:hidden;
+  border:1px solid rgba(0,0,0,.06);
+  transition:transform .25s,box-shadow .25s;cursor:pointer;
+}
+.rec-card:hover{transform:translateY(-5px);box-shadow:0 12px 32px rgba(0,0,0,.1)}
+.rec-img{
+  height:160px;display:flex;align-items:center;justify-content:center;font-size:4rem;
+  position:relative;
+}
+.rec-badge{
+  position:absolute;top:.6rem;left:.6rem;
+  background:var(--coral);color:white;border-radius:6px;
+  font-size:.6rem;font-weight:700;padding:.2rem .55rem;letter-spacing:.05em;text-transform:uppercase;
+}
+.rec-match{
+  position:absolute;top:.6rem;right:.6rem;
+  background:rgba(76,175,112,.9);color:white;border-radius:6px;
+  font-size:.65rem;font-weight:700;padding:.2rem .55rem;
+}
+.rec-info{padding:.9rem 1rem}
+.rec-name{font-size:.88rem;font-weight:700;color:var(--dark);margin-bottom:.2rem}
+.rec-why{font-size:.72rem;color:var(--lavender-deep);margin-bottom:.5rem;line-height:1.4;font-style:italic}
+.rec-price{font-size:.95rem;font-weight:700;color:var(--dark)}
+.rec-was{font-size:.75rem;color:var(--muted);text-decoration:line-through;margin-left:.35rem}
+.btn-add-rec{
+  width:100%;margin-top:.65rem;padding:.5rem;
+  background:var(--dark);color:white;border:none;border-radius:8px;
+  font-size:.75rem;font-weight:600;cursor:pointer;transition:background .2s;
+  letter-spacing:.04em;text-transform:uppercase;font-family:'DM Sans',sans-serif;
+}
+.btn-add-rec:hover{background:var(--coral)}
+
+.routine-section{
+  background:white;border-radius:20px;padding:2rem;
+  border:1px solid rgba(0,0,0,.06);margin-bottom:2rem;
+}
+.routine-steps{display:flex;flex-direction:column;gap:.75rem;margin-top:1.25rem}
+.routine-step{
+  display:flex;align-items:center;gap:1rem;padding:.85rem 1rem;
+  background:var(--light);border-radius:10px;
+}
+.step-num{
+  width:28px;height:28px;border-radius:50%;
+  background:var(--coral);color:white;font-size:.75rem;font-weight:800;
+  display:flex;align-items:center;justify-content:center;flex-shrink:0;
+}
+.step-info{}
+.step-time{font-size:.65rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--muted)}
+.step-name{font-size:.85rem;font-weight:600;color:var(--dark)}
+
+.results-actions{display:flex;gap:.75rem;justify-content:center;margin-top:2rem;flex-wrap:wrap}
+.btn-retake{
+  background:none;border:1.5px solid var(--coral);color:var(--coral);
+  border-radius:10px;padding:.75rem 1.75rem;font-family:'DM Sans',sans-serif;
+  font-size:.85rem;font-weight:600;cursor:pointer;transition:all .2s;
+}
+.btn-retake:hover{background:var(--coral);color:white}
+.btn-shop-all{
+  background:var(--dark);color:white;border:none;
+  border-radius:10px;padding:.78rem 1.75rem;font-family:'DM Sans',sans-serif;
+  font-size:.85rem;font-weight:700;cursor:pointer;transition:background .2s;
+}
+.btn-shop-all:hover{background:var(--coral)}
+
+/* tips box */
+.tips-box{
+  background:linear-gradient(135deg,#EDE8F8,#E8F3FA);
+  border-radius:16px;padding:1.5rem;margin-bottom:2rem;
+}
+.tips-box h3{font-family:'Playfair Display',serif;font-size:1rem;color:var(--dark);margin-bottom:1rem}
+.tips-list{display:flex;flex-direction:column;gap:.5rem}
+.tip-item{display:flex;align-items:flex-start;gap:.6rem;font-size:.82rem;color:var(--text);line-height:1.6}
+.tip-dot{width:6px;height:6px;border-radius:50%;background:var(--coral);margin-top:.45rem;flex-shrink:0}
+
+@media(max-width:760px){
+  .options-grid.cols-2,.options-grid.cols-3{grid-template-columns:1fr}
+  .rec-grid{grid-template-columns:1fr 1fr}
+  .quiz-hero{padding:3rem 1.25rem 2rem}
+}
+@media(max-width:500px){
+  .rec-grid{grid-template-columns:1fr}
+  .question-card{padding:1.75rem 1.25rem}
+}
+</style>
+</head>
+<body>
+<script>window.SKINDEX_PAGE='quiz';</script>
+
+<!-- HERO -->
+<section class="quiz-hero" id="quiz-hero">
+  <div class="quiz-hero-inner">
+    <div class="quiz-tag">✦ Personalised for you</div>
+    <h1>Find Your <em>Perfect</em><br>Skincare Routine</h1>
+    <p>Answer 6 quick questions about your skin and we'll recommend the products that work best for you — no guesswork needed.</p>
+    <div class="quiz-meta">
+      <div class="quiz-meta-item">⏱ 2 minutes</div>
+      <div class="quiz-meta-item">✦ 6 questions</div>
+      <div class="quiz-meta-item">🎯 Personalised picks</div>
+    </div>
+  </div>
+</section>
+
+<!-- PROGRESS -->
+<div class="progress-wrap" id="progress-section" style="display:none">
+  <div class="progress-bar-track">
+    <div class="progress-bar-fill" id="progress-fill" style="width:0%"></div>
+  </div>
+  <div class="progress-labels">
+    <span id="progress-label">Question 1 of 6</span>
+    <span id="progress-pct">0%</span>
+  </div>
+</div>
+
+<!-- QUIZ -->
+<div class="quiz-wrap" id="quiz-section">
+
+  <!-- START BUTTON -->
+  <div id="start-screen" style="text-align:center;padding:2rem 0">
+    <button class="btn-next" style="max-width:280px;margin:0 auto" onclick="startQuiz()">
+      Start My Skin Quiz →
+    </button>
+  </div>
+
+  <!-- QUESTION AREA -->
+  <div id="question-area" style="display:none"></div>
+
+</div>
+
+<!-- RESULTS -->
+<div class="results-wrap" id="results-section"></div>
+
+<script src="store.js"></script>
+<script src="nav.js"></script>
+<script>
+/* ══════════════════════════════════════════
+   QUIZ DATA
+══════════════════════════════════════════ */
+const QUESTIONS = [
+  {
+    id: 'skin_type',
+    title: 'What is your skin type?',
+    sub: 'Choose the option that best describes how your skin usually feels.',
+    multi: false,
+    cols: 2,
+    options: [
+      { emoji:'💧', label:'Dry',        desc:'Feels tight, flaky, or rough',          value:'dry'   },
+      { emoji:'✨', label:'Oily',        desc:'Shiny, enlarged pores, prone to acne',   value:'oily'  },
+      { emoji:'☯️', label:'Combination', desc:'Oily T-zone, dry on cheeks',             value:'combo' },
+      { emoji:'🌸', label:'Sensitive',   desc:'Easily irritated, redness, reactive',    value:'sensitive' },
+      { emoji:'🙂', label:'Normal',      desc:'Balanced, rarely breaks out',            value:'normal'},
+    ]
+  },
+  {
+    id: 'concerns',
+    title: 'What are your main skin concerns?',
+    sub: 'Select all that apply — we\'ll tailor recommendations to your needs.',
+    multi: true,
+    cols: 2,
+    options: [
+      { emoji:'🔆', label:'Dullness',        desc:'Skin looks tired or uneven tone',    value:'dull'       },
+      { emoji:'💦', label:'Dehydration',     desc:'Skin feels thirsty, lacks plumpness',value:'dehydrated' },
+      { emoji:'🕳️', label:'Large Pores',     desc:'Visible pores, especially on nose',  value:'pores'      },
+      { emoji:'🔴', label:'Redness',         desc:'Flushing, irritation, sensitivity',   value:'redness'    },
+      { emoji:'🌑', label:'Dark Spots',      desc:'Hyperpigmentation, sun spots',        value:'dark_spots' },
+      { emoji:'〰️', label:'Fine Lines',      desc:'Early signs of aging, loss of firmness',value:'aging'   },
+      { emoji:'🤧', label:'Breakouts',       desc:'Acne, blackheads, whiteheads',        value:'acne'       },
+      { emoji:'🛡️', label:'Damaged Barrier', desc:'Dry patches, stinging, peeling',     value:'barrier'    },
+    ]
+  },
+  {
+    id: 'age_range',
+    title: 'What is your age range?',
+    sub: 'Helps us recommend age-appropriate ingredients.',
+    multi: false,
+    cols: 3,
+    options: [
+      { emoji:'🌱', label:'Under 20', desc:'',   value:'teen'   },
+      { emoji:'✨', label:'20–29',    desc:'',   value:'20s'    },
+      { emoji:'🌸', label:'30–39',    desc:'',   value:'30s'    },
+      { emoji:'🌿', label:'40–49',    desc:'',   value:'40s'    },
+      { emoji:'🌟', label:'50+',      desc:'',   value:'50plus' },
+    ]
+  },
+  {
+    id: 'routine',
+    title: 'How would you describe your current routine?',
+    sub: 'We\'ll keep recommendations realistic for your lifestyle.',
+    multi: false,
+    cols: 1,
+    options: [
+      { emoji:'⚡', label:'Minimal',    desc:'Just cleanser + moisturiser, max 2 steps',    value:'minimal'  },
+      { emoji:'⚖️', label:'Moderate',   desc:'3–5 products, consistent morning & night',     value:'moderate' },
+      { emoji:'🧪', label:'Dedicated',  desc:'Full routine, multiple serums, love skincare', value:'full'     },
+    ]
+  },
+  {
+    id: 'sensitivity',
+    title: 'How does your skin react to new products?',
+    sub: 'This helps us avoid recommending anything too harsh for you.',
+    multi: false,
+    cols: 1,
+    options: [
+      { emoji:'🟢', label:'No reaction',        desc:'I can use almost anything without issues',             value:'none'     },
+      { emoji:'🟡', label:'Occasionally',       desc:'Sometimes I get a little redness or mild breakout',    value:'mild'     },
+      { emoji:'🔴', label:'Very sensitive',     desc:'I react to fragrance, actives, or new products easily',value:'high'     },
+    ]
+  },
+  {
+    id: 'goal',
+    title: 'What is your #1 skincare goal right now?',
+    sub: 'We\'ll prioritise this in your personalised routine.',
+    multi: false,
+    cols: 2,
+    options: [
+      { emoji:'💎', label:'Glass skin',      desc:'Smooth, luminous, dewy finish',        value:'glow'      },
+      { emoji:'🛡️', label:'Stronger barrier',desc:'Calm, resilient, protected skin',      value:'barrier'   },
+      { emoji:'⏳', label:'Anti-aging',      desc:'Firmer skin, fewer fine lines',         value:'antiaging' },
+      { emoji:'🔆', label:'Brighter tone',   desc:'Fade dark spots, even complexion',      value:'bright'    },
+      { emoji:'🧘', label:'Clear skin',      desc:'Control breakouts and oiliness',        value:'clear'     },
+      { emoji:'💧', label:'Hydration',       desc:'Plump, bouncy, well-moisturised skin',  value:'hydration' },
+    ]
+  }
+];
+
+/* ══════════════════════════════════════════
+   RECOMMENDATION ENGINE
+══════════════════════════════════════════ */
+function scoreProducts(answers, products) {
+  return products.map(p => {
+    let score = 0;
+    const name = p.name.toLowerCase();
+    const cat  = (p.cat || p.category || '').toLowerCase();
+
+    const skinType  = answers.skin_type   || '';
+    const concerns  = answers.concerns    || [];
+    const goal      = answers.goal        || '';
+    const sensitive = answers.sensitivity || '';
+    const routine   = answers.routine     || '';
+    const age       = answers.age_range   || '';
+
+    /* ── Serum scoring ── */
+    if (cat === 'serum') {
+      if (concerns.includes('barrier') || skinType === 'dry')      score += name.includes('barrier') ? 5 : 2;
+      if (concerns.includes('dark_spots') || goal === 'bright')    score += name.includes('vitamin') ? 5 : 0;
+      if (concerns.includes('dehydrated') || goal === 'hydration') score += 2;
+      if (goal === 'antiaging' && age !== 'teen')                  score += name.includes('barrier') || name.includes('vitamin') ? 3 : 1;
+    }
+
+    /* ── Toner scoring ── */
+    if (cat === 'toner') {
+      if (concerns.includes('dehydrated') || goal === 'hydration') score += name.includes('hydra') ? 5 : 2;
+      if (concerns.includes('pores') || skinType === 'oily')       score += name.includes('bha') || name.includes('pore') ? 5 : 1;
+      if (sensitive === 'high')                                     score += name.includes('bha') ? -2 : 1;
+    }
+
+    /* ── Moisturiser scoring ── */
+    if (cat === 'moisturizer') {
+      if (skinType === 'dry' || concerns.includes('barrier'))      score += name.includes('cloud') ? 4 : 3;
+      if (goal === 'antiaging' && (age === '40s' || age === '50plus' || age === '30s')) score += name.includes('overnight') ? 5 : 2;
+      if (goal === 'hydration' || concerns.includes('dehydrated')) score += 3;
+      if (routine === 'minimal')                                    score += name.includes('cloud') ? 2 : 1;
+    }
+
+    /* ── Cleanser scoring ── */
+    if (cat === 'cleanser') {
+      score += 2; // everyone needs a cleanser
+      if (sensitive === 'high')    score += name.includes('gentle') ? 4 : -1;
+      if (skinType === 'sensitive') score += name.includes('gentle') ? 3 : 0;
+      if (routine === 'minimal')   score += 3;
+    }
+
+    /* ── SPF scoring ── */
+    if (cat === 'spf') {
+      score += 3; // everyone needs SPF
+      if (concerns.includes('dark_spots') || goal === 'bright') score += 3;
+      if (skinType === 'oily')                                  score += name.includes('fluid') ? 3 : 1;
+    }
+
+    /* sensitivity penalty */
+    if (sensitive === 'high' && (p.badge === 'hot' || cat === 'toner' && name.includes('bha'))) score -= 3;
+
+    return { ...p, score };
+  }).sort((a, b) => b.score - a.score);
+}
+
+function getSkinProfile(answers) {
+  const type     = answers.skin_type || 'normal';
+  const concerns = answers.concerns  || [];
+  const goal     = answers.goal      || '';
+
+  const typeLabels = { dry:'Dry', oily:'Oily', combo:'Combination', sensitive:'Sensitive', normal:'Normal' };
+  const typeEmojis = { dry:'💧', oily:'✨', combo:'☯️', sensitive:'🌸', normal:'🙂' };
+
+  let description = '';
+  if (type === 'dry')       description = 'Your skin needs deep hydration and barrier repair to stay comfortable and glowing.';
+  else if (type === 'oily') description = 'Your skin benefits from lightweight, oil-controlling products that won\'t clog pores.';
+  else if (type === 'combo') description = 'Balance is key — hydrate dry areas while managing shine in the T-zone.';
+  else if (type === 'sensitive') description = 'Gentle, fragrance-free formulas are your best friend to keep skin calm and strong.';
+  else description = 'You\'re lucky! Focus on maintaining your healthy skin with targeted treatments.';
+
+  return {
+    label: typeLabels[type] || 'Normal',
+    emoji: typeEmojis[type] || '🙂',
+    description,
+  };
+}
+
+function getRoutine(answers, topProducts) {
+  const isAM = ['Cleanser', 'Toner', 'Serum', 'SPF'];
+  const isPM = ['Cleanser', 'Toner', 'Serum', 'Moisturizer'];
+  const routine = answers.routine || 'moderate';
+
+  const steps = routine === 'minimal'
+    ? ['Cleanser', 'Moisturizer', 'SPF']
+    : routine === 'full'
+    ? ['Cleanser', 'Toner', 'Serum', 'Moisturizer', 'SPF']
+    : ['Cleanser', 'Toner', 'Serum', 'SPF'];
+
+  return steps.map((cat, i) => {
+    const prod = topProducts.find(p => (p.cat || p.category) === cat);
+    return {
+      step: i + 1,
+      time: cat === 'SPF' ? 'Morning only' : i === 0 ? 'AM & PM' : 'AM & PM',
+      category: cat,
+      name: prod ? prod.name : cat + ' (coming soon)',
+    };
+  });
+}
+
+function getTips(answers) {
+  const concerns = answers.concerns || [];
+  const skinType = answers.skin_type || '';
+  const tips = [];
+
+  if (concerns.includes('dark_spots'))
+    tips.push('Apply SPF every morning — UV exposure is the #1 cause of dark spots.');
+  if (concerns.includes('barrier') || skinType === 'sensitive')
+    tips.push('Introduce new products one at a time, 1–2 weeks apart to avoid irritation.');
+  if (concerns.includes('acne') || skinType === 'oily')
+    tips.push('Double cleanse in the evening to remove sunscreen and excess sebum properly.');
+  if (concerns.includes('aging') || answers.age_range === '40s' || answers.age_range === '50plus')
+    tips.push('Consistency is key — most anti-aging ingredients take 8–12 weeks to show results.');
+  if (concerns.includes('dehydrated') || answers.goal === 'hydration')
+    tips.push('Apply toner and serum on slightly damp skin to lock in extra hydration.');
+  if (tips.length < 3)
+    tips.push('Less is more — a simple, consistent routine beats a complicated one used inconsistently.');
+
+  return tips.slice(0, 4);
+}
+
+/* ══════════════════════════════════════════
+   QUIZ STATE & UI
+══════════════════════════════════════════ */
+let currentQ    = 0;
+let answers     = {};
+let selections  = {};
+
+function startQuiz() {
+  document.getElementById('start-screen').style.display   = 'none';
+  document.getElementById('progress-section').style.display = 'block';
+  document.getElementById('question-area').style.display    = 'block';
+  renderQuestion(0);
+}
+
+function renderQuestion(idx) {
+  const q = QUESTIONS[idx];
+  currentQ = idx;
+  selections[q.id] = selections[q.id] || (q.multi ? [] : null);
+
+  /* progress */
+  const pct = Math.round((idx / QUESTIONS.length) * 100);
+  document.getElementById('progress-fill').style.width = pct + '%';
+  document.getElementById('progress-label').textContent = 'Question ' + (idx+1) + ' of ' + QUESTIONS.length;
+  document.getElementById('progress-pct').textContent   = pct + '%';
+
+  const multiHint = q.multi ? '<div class="q-multi-hint">✦ Select all that apply</div>' : '';
+  const opts = q.options.map(opt => {
+    const sel = q.multi
+      ? (selections[q.id]||[]).includes(opt.value)
+      : selections[q.id] === opt.value;
+    return `
+    <button class="opt-card ${sel?'selected':''}"
+      onclick="selectOpt('${q.id}',${q.multi},'${opt.value}',this)">
+      <span class="opt-emoji">${opt.emoji}</span>
+      <span class="opt-text">
+        <span class="opt-label">${opt.label}</span>
+        ${opt.desc ? `<span class="opt-desc">${opt.desc}</span>` : ''}
+      </span>
+      <span class="opt-check"></span>
+    </button>`;
+  }).join('');
+
+  document.getElementById('question-area').innerHTML = `
+    <div class="question-card">
+      <div class="q-step">Question ${idx+1} of ${QUESTIONS.length}</div>
+      <div class="q-title">${q.title}</div>
+      <div class="q-sub">${q.sub}</div>
+      ${multiHint}
+      <div class="options-grid cols-${q.cols}">${opts}</div>
+      <div class="quiz-nav">
+        ${idx > 0
+          ? '<button class="btn-prev" onclick="goBack()">← Back</button>'
+          : '<div></div>'
+        }
+        <button class="btn-next" id="btn-next"
+          onclick="goNext()"
+          ${!hasAnswer(q.id, q.multi) ? 'disabled' : ''}>
+          ${idx === QUESTIONS.length-1 ? 'See My Results ✨' : 'Next →'}
+        </button>
+      </div>
+    </div>`;
+}
+
+function selectOpt(qId, multi, value, btn) {
+  const q = QUESTIONS.find(x => x.id === qId);
+  if (multi) {
+    const arr = selections[qId] || [];
+    const i   = arr.indexOf(value);
+    if (i > -1) arr.splice(i, 1);
+    else arr.push(value);
+    selections[qId] = arr;
+
+    btn.classList.toggle('selected');
+    const check = btn.querySelector('.opt-check');
+    check.style.background   = btn.classList.contains('selected') ? 'var(--coral)' : '';
+    check.style.borderColor  = btn.classList.contains('selected') ? 'var(--coral)' : '';
+    check.textContent        = btn.classList.contains('selected') ? '✓' : '';
+  } else {
+    selections[qId] = value;
+    document.querySelectorAll('.opt-card').forEach(c => {
+      c.classList.remove('selected');
+      const ch = c.querySelector('.opt-check');
+      ch.style.background = ''; ch.style.borderColor = ''; ch.textContent = '';
+    });
+    btn.classList.add('selected');
+    const check = btn.querySelector('.opt-check');
+    check.style.background  = 'var(--coral)';
+    check.style.borderColor = 'var(--coral)';
+    check.textContent = '✓';
+  }
+
+  const nextBtn = document.getElementById('btn-next');
+  if (nextBtn) nextBtn.disabled = !hasAnswer(qId, multi);
+}
+
+function hasAnswer(qId, multi) {
+  return multi
+    ? (selections[qId] || []).length > 0
+    : selections[qId] != null;
+}
+
+function goNext() {
+  const q = QUESTIONS[currentQ];
+  answers[q.id] = selections[q.id];
+
+  if (currentQ < QUESTIONS.length - 1) {
+    renderQuestion(currentQ + 1);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  } else {
+    /* finish */
+    answers[q.id] = selections[q.id];
+    showResults();
+  }
+}
+
+function goBack() {
+  if (currentQ > 0) {
+    renderQuestion(currentQ - 1);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+}
+
+/* ══════════════════════════════════════════
+   RESULTS
+══════════════════════════════════════════ */
+function showResults() {
+  document.getElementById('quiz-section').style.display    = 'none';
+  document.getElementById('progress-section').style.display = 'none';
+  document.getElementById('quiz-hero').style.display        = 'none';
+
+  /* progress = 100% */
+  document.getElementById('progress-fill').style.width = '100%';
+
+  const resultsWrap = document.getElementById('results-section');
+  resultsWrap.style.display = 'block';
+  resultsWrap.innerHTML = '<div style="text-align:center;padding:4rem;color:var(--muted)"><div style="font-size:2rem;margin-bottom:1rem">🔍</div><div>Analysing your skin...</div></div>';
+
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+
+  /* wait for products to load */
+  onProductsReady(function(products) {
+    const scored = scoreProducts(answers, products);
+    const top    = scored.slice(0, 6);
+    const profile = getSkinProfile(answers);
+    const routine = getRoutine(answers, scored);
+    const tips    = getTips(answers);
+
+    const imgBgs = {
+      'product-img-lavender':'#EAE0F8',
+      'product-img-pink':    '#FFE0E8',
+      'product-img-butter':  '#FFF0D0',
+      'product-img-sage':    '#DDF0E0',
+    };
+
+    const recCards = top.map((p, i) => {
+      const bg      = imgBgs[p.imgClass || p.img_class] || '#F0EEF8';
+      const matchPct = Math.min(99, 70 + Math.round((p.score / (scored[0].score || 1)) * 29));
+      const discount  = p.was ? Math.round((1-p.price/p.was)*100) : 0;
+
+      /* personalised reason */
+      const cat = (p.cat || p.category || '').toLowerCase();
+      const concerns = answers.concerns || [];
+      let why = '';
+      if (cat === 'cleanser')    why = 'Essential first step for every routine';
+      else if (cat === 'spf')    why = 'Daily SPF protects all your other results';
+      else if (cat === 'toner' && p.name.toLowerCase().includes('hydra')) why = 'Adds layers of hydration before serum';
+      else if (cat === 'toner' && p.name.toLowerCase().includes('bha'))   why = 'Unclogs pores and controls shine';
+      else if (cat === 'serum' && p.name.toLowerCase().includes('barrier')) why = 'Rebuilds your skin barrier from within';
+      else if (cat === 'serum' && p.name.toLowerCase().includes('vitamin')) why = 'Fades dark spots and brightens tone';
+      else if (cat === 'moisturizer' && p.name.toLowerCase().includes('overnight')) why = 'Repairs skin while you sleep';
+      else why = 'Highly rated for your skin profile';
+
+      return `
+      <div class="rec-card" onclick="window.location='product.html?id=${p.id}'">
+        <div class="rec-img" style="background:${bg}">
+          ${p.badge ? `<div class="rec-badge">${p.badge}</div>` : ''}
+          <div class="rec-match">${matchPct}% match</div>
+          <span style="font-size:3.5rem">${p.icon}</span>
+        </div>
+        <div class="rec-info">
+          <div class="rec-name">${p.name}</div>
+          <div class="rec-why">✦ ${why}</div>
+          <div class="rec-price">
+            $${p.price.toFixed(2)}
+            ${p.was ? `<span class="rec-was">$${p.was.toFixed(2)}</span>` : ''}
+          </div>
+          <button class="btn-add-rec" onclick="event.stopPropagation();Cart.add(${p.id},'${(p.shades||['One size'])[0]}');this.textContent='✓ Added!';this.style.background='#4CAF90';setTimeout(()=>{this.textContent='Add to Bag';this.style.background=''},2000)">Add to Bag</button>
+        </div>
+      </div>`;
+    }).join('');
+
+    const routineSteps = routine.map(s => `
+      <div class="routine-step">
+        <div class="step-num">${s.step}</div>
+        <div class="step-info">
+          <div class="step-time">${s.time}</div>
+          <div class="step-name">${s.category} — ${s.name}</div>
+        </div>
+      </div>`).join('');
+
+    const tipsHTML = tips.map(t => `
+      <div class="tip-item">
+        <div class="tip-dot"></div>
+        <span>${t}</span>
+      </div>`).join('');
+
+    resultsWrap.innerHTML = `
+      <div class="results-hero">
+        <div class="icon">✨</div>
+        <h2>Your Personalised Routine</h2>
+        <p>${profile.description}</p>
+        <div class="skin-type-badge">${profile.emoji} ${profile.label} Skin</div>
+      </div>
+
+      <div class="results-section-title">🎯 Recommended for You</div>
+      <div class="rec-grid">${recCards}</div>
+
+      <div class="routine-section">
+        <div class="results-section-title" style="margin:0 0 .25rem">📋 Your Suggested Routine</div>
+        <div style="font-size:.8rem;color:var(--muted);margin-bottom:1rem">Based on your skin type and lifestyle</div>
+        <div class="routine-steps">${routineSteps}</div>
+      </div>
+
+      <div class="tips-box">
+        <h3>💡 Tips for Your Skin</h3>
+        <div class="tips-list">${tipsHTML}</div>
+      </div>
+
+      <div class="results-actions">
+        <button class="btn-retake" onclick="retakeQuiz()">Retake Quiz</button>
+        <button class="btn-shop-all" onclick="window.location='shop.html'">Shop All Products →</button>
+      </div>`;
+
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  });
+}
+
+function retakeQuiz() {
+  answers    = {};
+  selections = {};
+  currentQ   = 0;
+
+  document.getElementById('results-section').style.display  = 'none';
+  document.getElementById('quiz-hero').style.display         = '';
+  document.getElementById('progress-section').style.display  = 'none';
+  document.getElementById('quiz-section').style.display      = '';
+  document.getElementById('start-screen').style.display      = 'block';
+  document.getElementById('question-area').style.display     = 'none';
+
+  document.getElementById('progress-fill').style.width = '0%';
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+</script>
+</body>
+</html>
