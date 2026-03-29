@@ -17,7 +17,7 @@
 /* ── ITEM LIST ── */
 .cart-items{border-top:1px solid rgba(0,0,0,.08)}
 .cart-item{display:grid;grid-template-columns:88px 1fr auto;gap:1.5rem;align-items:center;padding:1.5rem 0;border-bottom:1px solid rgba(0,0,0,.06)}
-.cart-img{width:88px;height:88px;border-radius:var(--r);display:flex;align-items:center;justify-content:center;font-size:2.8rem;flex-shrink:0}
+.cart-img{width:88px;height:88px;border-radius:var(--r);display:flex;align-items:center;justify-content:center;font-size:2.8rem;flex-shrink:0;overflow:hidden;background:var(--light)}
 
 .cart-item-name{font-weight:600;font-size:.95rem;color:var(--dark);margin-bottom:.2rem}
 .cart-item-meta{font-size:.78rem;color:var(--muted);margin-bottom:.75rem}
@@ -104,17 +104,24 @@
   <div id="cartContent"></div>
 </div>
 
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="store.js"></script>
 <script src="nav.js"></script>
 <script>
   let discount = 0;
 
+  function getItemImage(item) {
+    // ดึง image_url จาก SKINDEX_PRODUCTS (ข้อมูลล่าสุดจาก Supabase)
+    const p = SKINDEX_PRODUCTS.find(x => String(x.id) === String(item.id));
+    return (p && p.image_url) ? p.image_url : (item.image_url || null);
+  }
+
   function renderCart(){
     const cart = Cart.get();
     const container = document.getElementById('cartContent');
+    const totalQty = cart.reduce((s,i)=>s+i.qty,0);
     document.getElementById('cartSubtitle').textContent =
-      cart.length ? cart.reduce((s,i)=>s+i.qty,0)+' item'+(cart.reduce((s,i)=>s+i.qty,0)!==1?'s':'') + ' in your bag'
-                  : 'Your bag is empty';
+      cart.length ? totalQty+' item'+(totalQty!==1?'s':'')+' in your bag' : 'Your bag is empty';
 
     if(!cart.length){
       container.innerHTML = `
@@ -129,8 +136,6 @@
 
     const sub = Cart.total();
     const total = Math.max(0, sub - discount);
-
-    // upsell: products not in cart
     const cartIds = new Set(cart.map(i=>i.id));
     const upsells = SKINDEX_PRODUCTS.filter(p=>!cartIds.has(p.id)).slice(0,4);
 
@@ -138,9 +143,18 @@
       <div class="cart-layout">
         <div>
           <div class="cart-items">
-            ${cart.map(item=>`
+            ${cart.map(item => {
+              const imgUrl = getItemImage(item);
+              const p = SKINDEX_PRODUCTS.find(x => String(x.id) === String(item.id));
+              const imgClass = p ? (p.imgClass || p.img_class) : (item.imgClass || '');
+              const imgHTML = imgUrl
+                ? `<img src="${imgUrl}" alt="${item.name}" style="width:100%;height:100%;object-fit:cover;display:block">`
+                : `<div class="${imgClass}" style="width:100%;height:100%;display:flex;align-items:center;justify-content:center;font-size:2.2rem">${item.icon}</div>`;
+              return `
               <div class="cart-item" id="ci-${item.key}">
-                <div class="cart-img ${item.imgClass}">${item.icon}</div>
+                <div class="cart-img" style="${imgUrl?'padding:0':''}">
+                  ${imgHTML}
+                </div>
                 <div class="cart-info">
                   <div class="cart-item-name">${item.name}</div>
                   <div class="cart-item-meta">Skindex · ${item.shade}</div>
@@ -157,8 +171,8 @@
                   <div class="item-price-val">$${(item.price*item.qty).toFixed(2)}</div>
                   <div class="item-price-unit">$${item.price.toFixed(2)} each</div>
                 </div>
-              </div>
-            `).join('')}
+              </div>`;
+            }).join('')}
           </div>
         </div>
 
@@ -169,20 +183,21 @@
             <button class="btn-apply" onclick="applyCoupon()">Apply</button>
           </div>
           <div class="coupon-msg" id="couponMsg"></div>
-          <div class="summary-row"><span>Subtotal (${cart.reduce((s,i)=>s+i.qty,0)} items)</span><span>$${sub.toFixed(2)}</span></div>
+          <div class="summary-row"><span>Subtotal (${totalQty} items)</span><span>$${sub.toFixed(2)}</span></div>
           <div class="summary-row"><span>Shipping</span><span style="color:#4CAF90">${sub>=500?'Free':'$9.90'}</span></div>
           ${discount>0?`<div class="summary-row discount"><span>Discount</span><span>−$${discount.toFixed(2)}</span></div>`:''}
           <div class="summary-row total"><span>Total</span><span>$${(total+(sub<500?9.90:0)).toFixed(2)}</span></div>
           <button class="btn-checkout" onclick="window.location='checkout.html'">Proceed to Checkout →</button>
           <button class="btn-back" onclick="window.location='shop.html'">← Continue Shopping</button>
           <div class="secure-row">🔒 Secure checkout · SSL encrypted</div>
-
           <div class="upsell">
             <div class="upsell-title">You might also like</div>
             <div class="upsell-grid">
-              ${upsells.slice(0,4).map(p=>`
+              ${upsells.map(p=>`
                 <div class="upsell-card" onclick="window.location='product.html?id=${p.id}'">
-                  <div class="upsell-img">${p.icon}</div>
+                  ${p.image_url
+                    ? `<img src="${p.image_url}" style="width:100%;height:60px;object-fit:cover;border-radius:6px;margin-bottom:.4rem">`
+                    : `<div class="upsell-img">${p.icon}</div>`}
                   <div class="upsell-name">${p.name}</div>
                   <div class="upsell-price">$${p.price.toFixed(2)}</div>
                 </div>
@@ -216,7 +231,8 @@
   }
 
   window.addEventListener('storage', renderCart);
-  renderCart();
+  // รอ Supabase โหลดก่อน เพื่อให้ดึง image_url ได้ถูกต้อง
+  onProductsReady(function(){ renderCart(); });
 </script>
 </body>
 </html>

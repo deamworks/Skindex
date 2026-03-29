@@ -24,6 +24,7 @@ function normalizeProduct(p) {
     was:p.price_was?parseFloat(p.price_was):null,
     price_was:p.price_was?parseFloat(p.price_was):null,
     icon:p.icon||"\u{1F4E6}",
+    image_url:p.image_url||null,
     imgClass:p.img_class||"product-img-lavender",
     img_class:p.img_class||"product-img-lavender",
     badge:p.badge||null,
@@ -32,6 +33,7 @@ function normalizeProduct(p) {
     review_count:parseInt(p.review_count)||0,
     stock:parseInt(p.stock)||0,
     shades:Array.isArray(p.shades)?p.shades:["One size"],
+    shade_prices:(p.shade_prices && typeof p.shade_prices==='object')?p.shade_prices:{},
     description:p.description||"",desc:p.description||"",
     ingredients:p.ingredients||"",
     active:p.active!==false,
@@ -52,6 +54,7 @@ async function fetchProducts(){
     window.SKINDEX_PRODUCTS=data.map(normalizeProduct);
     window.productsLoaded=true;
     console.log("Products loaded from Supabase:",window.SKINDEX_PRODUCTS.length);
+    console.log("Products with images:", window.SKINDEX_PRODUCTS.filter(p=>p.image_url).map(p=>({name:p.name, image_url:p.image_url})));
   }catch(e){
     console.warn("Using fallback products:",e.message);
     window.SKINDEX_PRODUCTS=FALLBACK_PRODUCTS;
@@ -75,10 +78,16 @@ window.renderStars=function(rating){
 window.productCardHTML=function(p,linkToProduct=true){
   const href="product.html?id="+p.id;
   const discount=p.was?Math.round((1-p.price/p.was)*100):0;
+  const imgClass = p.imgClass||p.img_class||"product-img-lavender";
+  const hasPhoto = !!p.image_url;
   return `<div class="product-card" onclick="${linkToProduct?"window.location=\'"+href+"\'":""}">
-    <div class="product-img ${p.imgClass||p.img_class}">
-      ${p.badge?`<div class="product-badge badge-${p.badge==="new"?"new":p.badge==="hot"?"hot":"sale"}">${p.badge.charAt(0).toUpperCase()+p.badge.slice(1)}</div>`:""}
-      <span style="font-size:3.5rem">${p.icon}</span>
+    <div class="${hasPhoto?'product-img':'product-img '+imgClass}"
+         style="${hasPhoto?'height:180px;overflow:hidden;position:relative;display:block;padding:0':''}">
+      ${p.badge?`<div class="product-badge badge-${p.badge==="new"?"new":p.badge==="hot"?"hot":"sale"}" style="position:absolute;top:.6rem;left:.6rem;z-index:1">${p.badge.charAt(0).toUpperCase()+p.badge.slice(1)}</div>`:""}
+      ${hasPhoto
+        ? `<img src="${p.image_url}" alt="${p.name}" style="width:100%;height:100%;object-fit:cover;display:block">`
+        : `<span style="font-size:3.5rem">${p.icon}</span>`
+      }
     </div>
     <div class="product-info">
       <div class="product-name">${p.name}</div>
@@ -110,7 +119,7 @@ window.Cart={
     const p=window.SKINDEX_PRODUCTS.find(x=>String(x.id)===String(productId));
     if(!p)return;
     if(ex){ex.qty++;}
-    else{cart.push({key,id:p.id,shade,qty:1,name:p.name,price:p.price,icon:p.icon,imgClass:p.imgClass||p.img_class});}
+    else{cart.push({key,id:p.id,shade,qty:1,name:p.name,price:p.price,icon:p.icon,imgClass:p.imgClass||p.img_class,image_url:p.image_url||null});}
     this.save(cart);
   },
   remove(key){this.save(this.get().filter(i=>i.key!==key));},

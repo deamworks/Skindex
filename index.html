@@ -6,11 +6,12 @@
   <link rel="shortcut icon" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAzMiAzMiI+CiAgPHJlY3Qgd2lkdGg9IjMyIiBoZWlnaHQ9IjMyIiByeD0iOCIgZmlsbD0iI0U4NjA0QSIvPgogIDx0ZXh0IHg9IjE2IiB5PSIyMyIgZm9udC1mYW1pbHk9Ikdlb3JnaWEsc2VyaWYiIGZvbnQtc2l6ZT0iMjIiIGZvbnQtd2VpZ2h0PSI3MDAiCiAgICB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmaWxsPSJ3aGl0ZSI+UzwvdGV4dD4KPC9zdmc+">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Skindex — Beauty & Skincare</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400;1,600&family=DM+Sans:wght@300;400;500;600&display=swap">
 <link rel="stylesheet" href="shared.css">
 <style>
 /* ── HERO ── */
-.hero{display:grid;grid-template-columns:1fr 1fr;min-height:380px;background:var(--lavender)}
+.hero{display:grid;grid-template-columns:1fr 1fr;min-height:380px;background:#FFD8DC}
 .hero-content{padding:4rem 3rem 3rem;display:flex;flex-direction:column;justify-content:center}
 .hero-tag{font-size:.7rem;font-weight:600;letter-spacing:.2em;text-transform:uppercase;color:var(--coral);margin-bottom:1rem}
 .hero-title{font-family:'Playfair Display',serif;font-size:clamp(2rem,3.5vw,3rem);line-height:1.2;color:var(--dark);margin-bottom:1.5rem;font-weight:700}
@@ -30,7 +31,7 @@
 .cat-item{display:flex;flex-direction:column;align-items:center;gap:.6rem;cursor:pointer;transition:transform .2s;text-decoration:none}
 .cat-item:hover{transform:translateY(-3px)}
 .cat-circle{width:80px;height:80px;border-radius:50%;position:relative;display:flex;align-items:center;justify-content:center;font-size:2rem;border:2px solid white;box-shadow:0 4px 15px rgba(0,0,0,.08)}
-.cat-badge{position:absolute;bottom:2px;right:2px;width:22px;height:22px;background:var(--dark);color:white;border-radius:50%;font-size:.6rem;font-weight:700;display:flex;align-items:center;justify-content:center;border:2px solid white}
+.cat-badge{display:none}
 .cat-c1{background:linear-gradient(135deg,#F9D4DC,#F4B0BE)}
 .cat-c2{background:linear-gradient(135deg,#D4E4F8,#B8CFF0)}
 .cat-c3{background:linear-gradient(135deg,#D4ECD4,#B8D8B8)}
@@ -39,13 +40,14 @@
 .cat-label{font-size:.8rem;font-weight:500;color:var(--text)}
 
 /* ── PROMO BANNERS ── */
-.promos{display:grid;grid-template-columns:1fr 1fr 1fr;gap:1.5rem;padding:2rem 3rem;background:white}
+.promos{display:grid;grid-template-columns:4fr 4fr 4fr 4fr;gap:1.5rem;padding:2rem 3rem;background:white}
 .promo-card{border-radius:var(--r-lg);overflow:hidden;cursor:pointer;transition:transform .25s}
 .promo-card:hover{transform:translateY(-4px)}
-.promo-bg{height:220px;display:flex;align-items:flex-end;justify-content:center;position:relative;padding:1.5rem}
+.promo-bg{height:350px; display:flex;align-items:flex-end;justify-content:center;position:relative;padding:1.5rem}
 .pb1{background:linear-gradient(160deg,#D8D0F0 0%,#C8B8E8 100%)}
 .pb2{background:linear-gradient(160deg,#E8E8E8 0%,#D8D8D0 100%)}
 .pb3{background:linear-gradient(160deg,#FFD8DC 0%,#FFBCC4 100%)}
+.pb4{background:linear-gradient(160deg,#FFD8DC 0%,#FFBCC4 100%)}
 .promo-emoji{font-size:5rem;position:absolute;top:50%;left:50%;transform:translate(-50%,-55%);filter:drop-shadow(0 8px 16px rgba(0,0,0,.15))}
 .promo-info{background:white;padding:1rem 1.2rem}
 .promo-title{font-family:'Playfair Display',serif;font-size:1rem;font-weight:600;color:var(--dark);margin-bottom:.2rem}
@@ -80,6 +82,7 @@
 
 /* ── FEATURED ── */
 .featured{padding:3.5rem 3rem;background:white}
+.product-img{height:260px; display:flex;align-items:flex-end;justify-content:center;position:relative;padding:1.5rem}
 .feat-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:2rem}
 .feat-link{font-size:.8rem;font-weight:600;color:var(--coral);text-decoration:none;letter-spacing:.05em;text-transform:uppercase}
 .feat-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:1.5rem}
@@ -112,6 +115,8 @@
   .newsletter{padding:3rem 1.5rem}
   .newsletter-form{flex-direction:column}
   .promos{padding:1.5rem}
+
+  
 }
 </style>
 </head>
@@ -125,14 +130,10 @@
     <h1 class="hero-title">Defining Beauty On<br>Our Own Terms</h1>
     <button class="btn-coral" onclick="window.location='shop.html'">SHOP NOW →</button>
   </div>
-  <div class="hero-image">
-    <div class="product-circles">
-      <div class="pcircle pc1">🧴</div>
-      <div class="pcircle pc2">💄</div>
-      <div class="pcircle pc3">🌿</div>
-      <div class="pcircle pc4">🧪</div>
-      <div class="pcircle pc5">✨</div>
-    </div>
+  <div class="hero-image" style="padding:0;overflow:hidden">
+    <img src="./photo/Minimalist Cream Jar.png"
+      alt="Skindex skincare collection"
+      style="width:100%;height:100%;object-fit:cover;object-position:center">
   </div>
 </section>
 
@@ -141,23 +142,33 @@
   <h2 class="section-title">Shop by Categories</h2>
   <div class="cat-grid">
     <a class="cat-item reveal d1" href="shop.html?cat=Makeup">
-      <div class="cat-circle cat-c1">💄<div class="cat-badge">23</div></div>
+      <div class="cat-circle cat-c1">
+        <img class="cat-img" src="./photo/Makeup Must-Haves Aesthetic.jpg" alt="Makeup" style="width:100%;height:100%;object-fit:cover;border-radius:50%">
+      </div>
       <span class="cat-label">Make up</span>
     </a>
     <a class="cat-item reveal d2" href="shop.html?cat=Bodycare">
-      <div class="cat-circle cat-c2">🧴<div class="cat-badge">16</div></div>
+      <div class="cat-circle cat-c2">
+        <img class="cat-img" src="./photo/bodyskin.png" alt="Bodycare" style="width:100%;height:100%;object-fit:cover;border-radius:50%">
+      </div>
       <span class="cat-label">Bodycare</span>
     </a>
     <a class="cat-item reveal d2" href="shop.html?cat=Skincare">
-      <div class="cat-circle cat-c3">🌿<div class="cat-badge">14</div></div>
+      <div class="cat-circle cat-c3">
+        <img class="cat-img" src="./photo/Skincare tips.jpg" alt="Skincare" style="width:100%;height:100%;object-fit:cover;border-radius:50%">
+      </div>
       <span class="cat-label">Skin care</span>
     </a>
     <a class="cat-item reveal d3" href="shop.html?cat=Gift">
-      <div class="cat-circle cat-c4">🎁<div class="cat-badge">42</div></div>
+      <div class="cat-circle cat-c4">
+        <img class="cat-img" src="./photo/set.png" alt="Gift Set" style="width:100%;height:100%;object-fit:cover;border-radius:50%">
+      </div>
       <span class="cat-label">Gifts set</span>
     </a>
     <a class="cat-item reveal d3" href="shop.html?cat=Hair">
-      <div class="cat-circle cat-c5">💆<div class="cat-badge">23</div></div>
+      <div class="cat-circle cat-c5">
+        <img class="cat-img" src="./photo/hair.jpg" alt="Hair" style="width:100%;height:100%;object-fit:cover;border-radius:50%">
+      </div>
       <span class="cat-label">Hair &amp; Body</span>
     </a>
   </div>
@@ -166,7 +177,9 @@
 <!-- PROMO BANNERS -->
 <div class="promos">
   <div class="promo-card reveal d1">
-    <div class="promo-bg pb1"><div class="promo-emoji">💜</div></div>
+    <div class="promo-bg pb1" style="padding:0;overflow:hidden">
+      <img src="./photo/Minimalist Sand Scene.png" alt="Promo 1" style="width:100%;height:100%;object-fit:cover;object-position:center">
+    </div>
     <div class="promo-info">
       <div class="promo-title">Buy 1 Get 1</div>
       <div class="promo-sub">Starting at $799</div>
@@ -174,7 +187,9 @@
     </div>
   </div>
   <div class="promo-card reveal d2">
-    <div class="promo-bg pb2"><div class="promo-emoji">🧴</div></div>
+    <div class="promo-bg pb2" style="padding:0;overflow:hidden">
+      <img src="./photo/Skincare Product Display.png " alt="Promo 2" style="width:100%;height:100%;object-fit:cover;object-position:center">
+    </div>
     <div class="promo-info">
       <div class="promo-title">Save on Sets</div>
       <div class="promo-sub">Special offer</div>
@@ -182,11 +197,23 @@
     </div>
   </div>
   <div class="promo-card reveal d3">
-    <div class="promo-bg pb3"><div class="promo-emoji">✨</div></div>
+    <div class="promo-bg pb3" style="padding:0;overflow:hidden">
+      <img src="./photo/Minimalist Skincare Display (1).png" alt="Promo 3" style="width:100%;height:100%;object-fit:cover;object-position:center">
+    </div>
     <div class="promo-info">
       <div class="promo-title">Feel your Glowy</div>
       <div class="promo-sub">Made with love</div>
       <button class="btn-outline" onclick="window.location='shop.html'">EXPLORE NOW</button>
+    </div>
+  </div>
+  <div class="promo-card reveal d4">
+    <div class="promo-bg pb1" style="padding:0;overflow:hidden">
+      <img src="./photo/Minimalist Cosmetic Display (1).png" alt="Promo 1" style="width:100%;height:100%;object-fit:cover;object-position:center">
+    </div>
+    <div class="promo-info">
+      <div class="promo-title">Buy 1 Get 1</div>
+      <div class="promo-sub">Starting at $799</div>
+      <button class="btn-outline" onclick="window.location='shop.html'">SHOP SALE</button>
     </div>
   </div>
 </div>
@@ -194,22 +221,22 @@
 <!-- TRUST -->
 <div class="trust">
   <div class="trust-item reveal d1">
-    <span class="trust-icon">🛡️</span>
+    <span class="trust-icon"><i class="fa-solid fa-shield-heart" style="color: rgb(232, 96, 74);"></i></span>
     <div class="trust-title">Safety First</div>
     <div class="trust-desc">100% Clean, Non-Irritating,<br>Derm Tested</div>
   </div>
   <div class="trust-item reveal d2">
-    <span class="trust-icon">🚚</span>
+    <span class="trust-icon"><i class="fa-solid fa-truck-fast" style="color: rgb(232, 96, 74);"></i></span>
     <div class="trust-title">Free Shipping</div>
-    <div class="trust-desc">Free shipping on all U.S.<br>orders $500+</div>
+    <div class="trust-desc">Free shipping on <br>all orders $500+</div>
   </div>
   <div class="trust-item reveal d2">
-    <span class="trust-icon">🐰</span>
+    <span class="trust-icon"><i class="fa-solid fa-rabbit" style="color: rgb(232, 96, 74);"></i></span>
     <div class="trust-title">No Animal Testing</div>
     <div class="trust-desc">Tested on human volunteers,<br>not animals.</div>
   </div>
   <div class="trust-item reveal d3">
-    <span class="trust-icon">🌿</span>
+    <span class="trust-icon"><i class="fa-brands fa-pagelines" style="color: rgb(232, 96, 74);"></i></i></span>
     <div class="trust-title">Organic</div>
     <div class="trust-desc">Natural &amp; organic beauty<br>products</div>
   </div>
@@ -219,7 +246,9 @@
 <section class="deal">
   <div class="deal-visual">
     <div class="save-badge"><span style="font-size:.58rem">Save</span><span class="amount">$13</span></div>
-    <div class="deal-product">💄</div>
+    <img src="./photo/lip.png"
+      alt="Deal of the day"
+      style="max-height:350px;object-fit:contain;filter:drop-shadow(0 16px 32px rgba(0,0,0,.15));animation:dealFloat 3s ease-in-out infinite;position:relative;z-index:1 ">
   </div>
   <div class="deal-content reveal">
     <div class="deal-tag">✦ Deal of the Day</div>
@@ -248,15 +277,18 @@
       <div class="feat-hero-badge">✦ Customer Favorite</div>
       <div class="feat-hero-title">Antioxidants PM Facial Oil</div>
       <button class="btn-coral" style="width:fit-content;font-size:.78rem;padding:.6rem 1.4rem" onclick="window.location='shop.html'">SHOP NOW</button>
-      <div class="feat-hero-emoji">🧴</div>
+      <img src="./photo/Minimalist Skincare Display.png " style="width:100%;height:100%;object-fit:cover"
+        alt="Customer Favorite"
+        style="position:absolute;bottom:0;right:0;width:65%;object-fit:contain;filter:drop-shadow(0 8px 16px rgba(0,0,0,.1))">
     </div>
     <div class="feat-products">
       <div class="product-card reveal d2" onclick="window.location='product.html?id=0'">
-        <div class="product-img product-img-lavender">
-          <div class="product-badge badge-new">New</div>💄
+        <div class="product-img" style="padding:0;overflow:hidden">
+          <div class="product-badge badge-new">New</div>
+          <img src="./photo/Minimalist Spa Setup.png" alt="Skindex Cream Blush" style="width:100%;height:100%;object-fit:cover">
         </div>
         <div class="product-info">
-          <div class="product-name">Skindex Cream Blush</div>
+          <div class="product-name">Skindex Spa Set</div>
           <div class="product-stars">★★★★★ <span>2,687 reviews</span></div>
           <div class="product-price"><span class="price-old">$39.00</span><span class="price-new">$29.00</span></div>
           <button class="btn-add" onclick="event.stopPropagation();Cart.add(0,'30 ml');showAddedFeedback(this)">Add to Bag</button>
@@ -265,11 +297,12 @@
     </div>
     <div class="feat-products">
       <div class="product-card reveal d3" onclick="window.location='product.html?id=2'">
-        <div class="product-img product-img-pink">
-          <div class="product-badge badge-hot">Hot</div>🫙
+        <div class="product-img" style="padding:0;overflow:hidden">
+          <div class="product-badge badge-hot">Hot</div>
+          <img src="./photo/Minimalist Cosmetic Display.png" alt="Holy Grail Cream" style="width:100%;height:100%;object-fit:cover">
         </div>
         <div class="product-info">
-          <div class="product-name">Holy Grail Cream Blush</div>
+          <div class="product-name">Holy Grail Cream</div>
           <div class="product-stars">★★★★★ <span>4,287 reviews</span></div>
           <div class="product-price"><span class="price-old">$39.00</span><span class="price-new">$29.00</span></div>
           <button class="btn-add" onclick="event.stopPropagation();Cart.add(2,'30 ml');showAddedFeedback(this)">Choose Color</button>

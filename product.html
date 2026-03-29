@@ -201,12 +201,14 @@
 
 <div class="toast" id="toast"></div>
 
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="store.js"></script>
 <script src="nav.js"></script>
 <script>
   let currentId = 0;
   let currentQty = 1;
   let currentShade = '';
+  let currentPrice = 0;
 
   function loadProduct(id){
     currentId = id;
@@ -214,7 +216,17 @@
     currentShade = '';
     document.getElementById('qtyVal').textContent = '1';
 
-    const p = SKINDEX_PRODUCTS[id];
+    const p = SKINDEX_PRODUCTS.find(x => String(x.id) === String(id));
+    if(!p){
+      document.querySelector('.product-wrap').innerHTML =
+        `<div style="text-align:center;padding:5rem 2rem">
+           <div style="font-size:3rem">😕</div>
+           <h2 style="font-family:'Playfair Display',serif;margin:1rem 0 .5rem">ไม่พบสินค้า</h2>
+           <a href="shop.html"><button class="btn-coral">← กลับไปหน้าร้าน</button></a>
+         </div>`;
+      return;
+    }
+    currentPrice = p.price;
     document.title = p.name + ' — Skindex';
     document.getElementById('bcName').textContent = p.name;
     document.getElementById('pBrand').textContent = p.brand.toUpperCase();
@@ -235,26 +247,40 @@
     } else { document.getElementById('pBadge').innerHTML=''; }
 
     // gallery
-    const icons = [p.icon,'🌿','✨'];
-    document.getElementById('galMain').innerHTML = `<span style="font-size:9rem">${p.icon}</span>`;
-    document.getElementById('galThumbs').innerHTML = icons.map((ic,i)=>
-      `<div class="thumb${i===0?' active':''}" onclick="setThumb(this,'${ic}')" style="background:${p.imgClass.includes('pink')?'#FFE4E8':p.imgClass.includes('butter')?'#FFF0D0':p.imgClass.includes('sage')?'#E0F0D8':'#EAE0F8'}">${ic}</div>`
-    ).join('');
+    const bg = p.imgClass.includes('pink')?'#FFE4E8':p.imgClass.includes('butter')?'#FFF0D0':p.imgClass.includes('sage')?'#E0F0D8':'#EAE0F8';
+    if(p.image_url){
+      document.getElementById('galMain').innerHTML =
+        `<img src="${p.image_url}" alt="${p.name}" style="width:100%;height:100%;object-fit:cover;border-radius:var(--r-lg)">`;
+      document.getElementById('galThumbs').innerHTML =
+        `<div class="thumb active" onclick="setThumbImg(this,'${p.image_url}')" style="background:${bg};overflow:hidden;padding:0">
+           <img src="${p.image_url}" alt="" style="width:100%;height:100%;object-fit:cover;border-radius:8px">
+         </div>
+         <div class="thumb" onclick="setThumb(this,'🌿')" style="background:${bg}">🌿</div>
+         <div class="thumb" onclick="setThumb(this,'✨')" style="background:${bg}">✨</div>`;
+    } else {
+      const icons = [p.icon,'🌿','✨'];
+      document.getElementById('galMain').innerHTML = `<span style="font-size:9rem">${p.icon}</span>`;
+      document.getElementById('galThumbs').innerHTML = icons.map((ic,i)=>
+        `<div class="thumb${i===0?' active':''}" onclick="setThumb(this,'${ic}')" style="background:${bg}">${ic}</div>`
+      ).join('');
+    }
 
-    // shades
+    // shades + ราคาแต่ละ size
     currentShade = p.shades[0];
-    document.getElementById('shadeRow').innerHTML = p.shades.map((s,i)=>
-      `<button class="shade-btn${i===0?' active':''}" onclick="selectShade(this,'${s}')">${s}</button>`
-    ).join('');
+    const shadePrices = p.shade_prices || {};
+    document.getElementById('shadeRow').innerHTML = p.shades.map((s,i) => {
+      const sp = shadePrices[s];
+      return `<button class="shade-btn${i===0?' active':''}" onclick="selectShade(this,'${s}',${sp||p.price})">${s}</button>`;
+    }).join('');
 
     // meta
     const metas = [
-      {icon:'🌿', key:'Key Ingredient', val: p.ingredients.split(',').slice(0,2).join(', ')},
-      {icon:'🐰', key:'Cruelty-free',   val:'Yes — Leaping Bunny certified'},
-      {icon:'🏭', key:'Made in',        val:'South Korea'},
+      {key:'Key Ingredient', val: p.ingredients ? p.ingredients.split(',').slice(0,2).join(', ') : '—'},
+      {key:'Cruelty-free',   val:'Yes — Leaping Bunny certified'},
+      {key:'Made in',        val:'South Korea'},
     ];
     document.getElementById('pMeta').innerHTML = metas.map(m=>
-      `<div class="meta-row"><span class="meta-icon">${m.icon}</span><span class="meta-key">${m.key}</span><span class="meta-val">${m.val}</span></div>`
+      `<div class="meta-row"><span class="meta-key">${m.key}</span><span class="meta-val">${m.val}</span></div>`
     ).join('');
 
     // tabs
@@ -281,7 +307,7 @@
     document.getElementById('tab-desc').classList.add('active');
 
     // related
-    const related = SKINDEX_PRODUCTS.filter(pp=>pp.id!==id).slice(0,4);
+    const related = SKINDEX_PRODUCTS.filter(pp=>String(pp.id)!==String(id)).slice(0,4);
     document.getElementById('relatedGrid').innerHTML = related.map(pp=>productCardHTML(pp)).join('');
   }
 
@@ -290,17 +316,37 @@
     el.classList.add('active');
     document.getElementById('galMain').innerHTML = `<span style="font-size:9rem">${icon}</span>`;
   }
-  function selectShade(el,shade){
+  function setThumbImg(el,url){
+    document.querySelectorAll('.thumb').forEach(t=>t.classList.remove('active'));
+    el.classList.add('active');
+    document.getElementById('galMain').innerHTML =
+      `<img src="${url}" alt="" style="width:100%;height:100%;object-fit:cover;border-radius:var(--r-lg)">`;
+  }
+  function selectShade(el, shade, price){
     document.querySelectorAll('.shade-btn').forEach(b=>b.classList.remove('active'));
     el.classList.add('active');
     currentShade = shade;
+    currentPrice = price;
+    document.getElementById('pPrice').textContent = '$' + parseFloat(price).toFixed(2);
   }
   function changeQty(d){
     currentQty = Math.max(1, currentQty+d);
     document.getElementById('qtyVal').textContent = currentQty;
   }
   function addToCartCurrent(){
-    for(let i=0;i<currentQty;i++) Cart.add(currentId, currentShade);
+    const p = SKINDEX_PRODUCTS.find(x=>String(x.id)===String(currentId));
+    if(!p) return;
+    const cartItem = {
+      key: currentId+'__'+currentShade,
+      id: p.id, shade: currentShade, qty: currentQty,
+      name: p.name, price: currentPrice,
+      icon: p.icon, imgClass: p.imgClass||p.img_class,
+      image_url: p.image_url||null
+    };
+    const cart = Cart.get();
+    const ex = cart.find(i=>i.key===cartItem.key);
+    if(ex){ ex.qty += currentQty; Cart.save(cart); }
+    else { cart.push(cartItem); Cart.save(cart); }
     showToast('🛒 Added to bag!');
   }
   function switchTab(btn, id){
@@ -320,9 +366,9 @@
     toastT = setTimeout(()=>el.classList.remove('show'), 2400);
   }
 
-  // Load from URL param
-  const pid = parseInt(new URLSearchParams(location.search).get('id'))||0;
-  loadProduct(pid);
+  // รอ Supabase โหลดก่อนเสมอ
+  const pid = new URLSearchParams(location.search).get('id');
+  onProductsReady(function(){ loadProduct(pid); });
 </script>
 </body>
 </html>

@@ -37,10 +37,13 @@ body{
   background:var(--lavender-deep);
   color:white;
   text-align:center;
-  padding:.45rem;
-  font-size:.75rem;
+  padding:.4rem 1rem;
+  font-size:.72rem;
   font-weight:500;
-  letter-spacing:.06em;
+  letter-spacing:.05em;
+  white-space:nowrap;
+  overflow:hidden;
+  text-overflow:ellipsis;
 }
 
 /* ── NAV ── */
@@ -55,11 +58,12 @@ nav{
   display:flex;
   align-items:center;
   justify-content:space-between;
-  padding:.75rem 3rem;
+  padding:.65rem 3rem;
   border-bottom:1px solid rgba(0,0,0,.04);
   position:relative;
+  min-height:56px;
 }
-.nav-social{display:flex;gap:.75rem;align-items:center}
+.nav-social{display:flex;gap:.75rem;align-items:center;min-width:100px}
 .nav-social a{
   color:var(--muted);font-size:.85rem;
   text-decoration:none;transition:color .2s;
@@ -74,12 +78,14 @@ nav{
   position:absolute;
   left:50%;
   transform:translateX(-50%);
+  white-space:nowrap;
 }
-.nav-actions{display:flex;align-items:center;gap:1.2rem}
+.nav-actions{display:flex;align-items:center;gap:1rem;min-width:100px;justify-content:flex-end}
 .nav-icon{
   background:none;border:none;cursor:pointer;
   color:var(--text);font-size:1rem;padding:.3rem;
   position:relative;transition:color .2s;
+  display:flex;align-items:center;
 }
 .nav-icon:hover{color:var(--coral)}
 .cart-badge{
@@ -92,11 +98,11 @@ nav{
 .cart-total{font-size:.82rem;font-weight:600;color:var(--text)}
 .nav-main{
   display:flex;align-items:center;justify-content:center;
-  gap:3rem;padding:.7rem 3rem;
+  gap:3rem;padding:.65rem 3rem;
 }
 .nav-main a{
-  font-size:.83rem;font-weight:500;color:var(--text);
-  text-decoration:none;letter-spacing:.08em;text-transform:uppercase;
+  font-size:.8rem;font-weight:600;color:var(--text);
+  text-decoration:none;letter-spacing:.1em;text-transform:uppercase;
   transition:color .2s;padding:.25rem 0;
   border-bottom:2px solid transparent;
 }
@@ -171,7 +177,7 @@ footer{background:var(--dark);color:rgba(255,255,255,.7);padding:3rem 3rem 2rem}
 .product-card:hover{transform:translateY(-4px);box-shadow:0 12px 30px rgba(0,0,0,.08)}
 .product-img{
   height:180px;display:flex;align-items:center;
-  justify-content:center;font-size:4.5rem;position:relative;
+  justify-content:center;font-size:4.5rem;position:relative;overflow:hidden;
 }
 .product-img-pink{background:linear-gradient(135deg,#FFE0E8,#FFD0DC)}
 .product-img-lavender{background:linear-gradient(135deg,#EAE0F8,#DDD0F0)}
@@ -202,8 +208,44 @@ footer{background:var(--dark);color:rgba(255,255,255,.7);padding:3rem 3rem 2rem}
 
 /* ── RESPONSIVE ── */
 @media(max-width:900px){
-  .nav-top{padding:.75rem 1.5rem}
+  .nav-top{padding:.65rem 1.5rem;min-height:52px}
   .nav-main{gap:1.5rem;padding:.6rem 1.5rem}
   .footer-top{grid-template-columns:1fr 1fr;gap:2rem}
   footer{padding:2.5rem 1.5rem}
+}
+
+/* Mobile ── layout เปลี่ยนเป็น 3 คอลัมน์ชัดเจน */
+@media(max-width:768px){
+  .nav-social{display:none!important}
+  .nav-top{
+    padding:.6rem 1.25rem;
+    min-height:52px;
+    display:grid;
+    grid-template-columns:1fr auto 1fr;
+    align-items:center;
+  }
+  .nav-logo{
+    position:static;
+    transform:none;
+    font-size:1.5rem;
+    text-align:center;
+    justify-self:center;
+  }
+  .nav-actions{
+    justify-self:end;
+    gap:.65rem;
+  }
+  .nav-actions .nav-icon:nth-child(2),
+  .nav-actions .nav-icon:nth-child(3){display:none}
+  .topbar{
+    font-size:.67rem;
+    letter-spacing:.03em;
+    padding:.35rem .75rem;
+    white-space:nowrap;
+    overflow-x:auto;
+    scrollbar-width:none;
+    -ms-overflow-style:none;
+    text-align:left;
+  }
+  .topbar::-webkit-scrollbar{display:none}
 }

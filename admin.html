@@ -476,9 +476,38 @@ textarea.f-input-m{resize:vertical;min-height:80px;line-height:1.6}
           </select>
         </div>
         <div class="f-group-m">
-          <label class="f-label-m">Icon (emoji)</label>
-          <input class="f-input-m" id="f-icon" placeholder="🧴" maxlength="4">
+          <label class="f-label-m">Emoji (fallback)</label>
+          <input class="f-input-m" id="f-icon" placeholder=" " maxlength="4">
+          <div style="font-size:.7rem;color:var(--muted);margin-top:.25rem">ใช้แค่ตอนยังไม่มีรูป</div>
         </div>
+      </div>
+
+      <!-- IMAGE UPLOAD -->
+      <div class="f-group-m">
+        <label class="f-label-m">รูปสินค้า</label>
+        <div id="img-upload-area" style="
+          border:2px dashed #E8E4F3;border-radius:12px;padding:1.25rem;
+          display:flex;align-items:center;gap:1rem;cursor:pointer;transition:border-color .2s;
+        " onclick="document.getElementById('f-img-file').click()"
+           onmouseenter="this.style.borderColor='var(--coral)'"
+           onmouseleave="this.style.borderColor='#E8E4F3'">
+          <div id="img-preview-wrap" style="
+            width:80px;height:80px;border-radius:10px;background:#F0EEF8;
+            display:flex;align-items:center;justify-content:center;
+            font-size:2rem;flex-shrink:0;overflow:hidden;
+          ">
+            <span id="img-preview-emoji">📷</span>
+            <img id="img-preview-img" src="" alt="" style="display:none;width:100%;height:100%;object-fit:cover">
+          </div>
+          <div>
+            <div style="font-size:.85rem;font-weight:600;color:var(--dark);margin-bottom:.25rem">คลิกเพื่อเลือกรูป</div>
+            <div style="font-size:.72rem;color:var(--muted)">JPG, PNG, WebP · max 3MB</div>
+            <div id="img-upload-status" style="font-size:.72rem;margin-top:.3rem;color:var(--coral)"></div>
+          </div>
+        </div>
+        <input type="file" id="f-img-file" accept="image/*" style="display:none" onchange="previewProductImg(event)">
+        <!-- hidden: เก็บ URL หลัง upload -->
+        <input type="hidden" id="f-img-url">
       </div>
 
       <div class="form-row">
@@ -498,7 +527,7 @@ textarea.f-input-m{resize:vertical;min-height:80px;line-height:1.6}
           <input class="f-input-m" id="f-stock" type="number" placeholder="100">
         </div>
         <div class="f-group-m">
-          <label class="f-label-m">Image CSS Class</label>
+          <label class="f-label-m">พื้นหลัง (ถ้าไม่มีรูป)</label>
           <select class="f-input-m" id="f-imgclass">
             <option value="product-img-lavender">Lavender</option>
             <option value="product-img-pink">Pink</option>
@@ -522,6 +551,12 @@ textarea.f-input-m{resize:vertical;min-height:80px;line-height:1.6}
       <div class="f-group-m">
         <label class="f-label-m">Sizes / Shades <span style="font-weight:400;text-transform:none;color:var(--muted)">(คั่นด้วย comma)</span></label>
         <input class="f-input-m" id="f-shades" placeholder="30 ml, 50 ml, 75 ml">
+      </div>
+
+      <div class="f-group-m">
+        <label class="f-label-m">ราคาแต่ละ Size <span style="font-weight:400;text-transform:none;color:var(--muted)">(JSON: {"30 ml":38,"50 ml":52} — เว้นว่างถ้าราคาเดียว)</span></label>
+        <input class="f-input-m" id="f-shade-prices" placeholder='{"30 ml": 38, "50 ml": 52, "75 ml": 65}'>
+        <div class="f-hint">ถ้าใส่ราคาแต่ละ size ระบบจะแสดงราคาเปลี่ยนเมื่อลูกค้าเลือก</div>
       </div>
 
       <div class="f-group-m">
@@ -756,7 +791,12 @@ function renderTable(products) {
 
     return `
     <div class="prod-row">
-      <div class="prod-thumb" style="background:${bg}">${p.icon||'📦'}</div>
+      <div class="prod-thumb" style="background:${bg};overflow:hidden;padding:0">
+        ${p.image_url
+          ? `<img src="${p.image_url}" alt="${p.name}" style="width:100%;height:100%;object-fit:cover;border-radius:8px">`
+          : `<span style="font-size:1.6rem">${p.icon||'📦'}</span>`
+        }
+      </div>
       <div class="prod-info">
         <div class="prod-name">${p.name}</div>
         <div class="prod-brand">${p.brand||'Skindex'} · ${p.category||'—'}</div>
@@ -815,7 +855,13 @@ function openEditModal(id) {
   document.getElementById('f-stock').value  = p.stock      || 100;
   document.getElementById('f-imgclass').value = p.img_class || 'product-img-lavender';
   document.getElementById('f-badge').value  = p.badge      || '';
+  resetImgPreview(p.image_url || null);
   document.getElementById('f-shades').value = (p.shades||[]).join(', ');
+  // shade_prices: แสดงเป็น JSON string
+  const spVal = p.shade_prices && Object.keys(p.shade_prices).length
+    ? JSON.stringify(p.shade_prices)
+    : '';
+  document.getElementById('f-shade-prices').value = spVal;
   document.getElementById('f-desc').value   = p.description || '';
   document.getElementById('f-ingr').value   = p.ingredients || '';
   document.getElementById('f-active').checked = p.active !== false;
@@ -834,7 +880,7 @@ function closeModal() {
 }
 
 function clearForm() {
-  ['f-name','f-brand','f-cat','f-icon','f-price','f-was','f-stock','f-imgclass','f-badge','f-shades','f-desc','f-ingr'].forEach(id => {
+  ['f-name','f-brand','f-cat','f-icon','f-price','f-was','f-stock','f-imgclass','f-badge','f-shades','f-shade-prices','f-desc','f-ingr'].forEach(id => {
     const el = document.getElementById(id);
     if (el.tagName === 'SELECT') el.selectedIndex = 0;
     else el.value = '';
@@ -842,6 +888,7 @@ function clearForm() {
   document.getElementById('f-brand').value   = 'Skindex';
   document.getElementById('f-stock').value   = '100';
   document.getElementById('f-active').checked = true;
+  resetImgPreview(null);
   document.querySelectorAll('.badge-opt').forEach(b => {
     b.className = 'badge-opt' + (b.dataset.val === '' ? ' sel-none active-badge' : '');
   });
@@ -853,6 +900,72 @@ function setBadge(btn, val) {
     const suffix = b.dataset.val || 'none';
     b.className = 'badge-opt' + (b === btn ? ' sel-'+suffix+' active-badge' : '');
   });
+}
+
+/* ── PRODUCT IMAGE UPLOAD ── */
+async function previewProductImg(event) {
+  const file = event.target.files[0];
+  if (!file) return;
+
+  if (file.size > 3 * 1024 * 1024) {
+    document.getElementById('img-upload-status').textContent = 'ไฟล์ใหญ่เกิน 3MB';
+    return;
+  }
+
+  /* แสดง preview ทันที */
+  const reader = new FileReader();
+  reader.onload = e => {
+    const previewImg   = document.getElementById('img-preview-img');
+    const previewEmoji = document.getElementById('img-preview-emoji');
+    previewImg.src          = e.target.result;
+    previewImg.style.display = 'block';
+    previewEmoji.style.display = 'none';
+  };
+  reader.readAsDataURL(file);
+
+  document.getElementById('img-upload-status').textContent = 'Uploading...';
+  document.getElementById('img-upload-status').style.color = 'var(--muted)';
+
+  try {
+    const ext      = file.name.split('.').pop();
+    const fileName = 'products/' + Date.now() + '.' + ext;
+
+    const { data, error } = await sb.storage
+      .from('products')
+      .upload(fileName, file, { upsert: true, contentType: file.type });
+
+    if (error) throw error;
+
+    const { data: { publicUrl } } = sb.storage
+      .from('products')
+      .getPublicUrl(fileName);
+
+    document.getElementById('f-img-url').value = publicUrl;
+    document.getElementById('img-upload-status').textContent = '✓ Upload สำเร็จ';
+    document.getElementById('img-upload-status').style.color = 'var(--green)';
+
+  } catch(e) {
+    console.error('Upload error:', e);
+    document.getElementById('img-upload-status').textContent = 'Upload ไม่สำเร็จ: ' + e.message;
+    document.getElementById('img-upload-status').style.color = 'var(--red)';
+  }
+}
+
+function resetImgPreview(url) {
+  const previewImg   = document.getElementById('img-preview-img');
+  const previewEmoji = document.getElementById('img-preview-emoji');
+  if (url) {
+    previewImg.src           = url;
+    previewImg.style.display = 'block';
+    previewEmoji.style.display = 'none';
+  } else {
+    previewImg.src           = '';
+    previewImg.style.display = 'none';
+    previewEmoji.style.display = 'block';
+    previewEmoji.textContent  = '📷';
+  }
+  document.getElementById('img-upload-status').textContent = '';
+  document.getElementById('f-img-url').value = url || '';
 }
 
 async function saveProduct() {
@@ -868,23 +981,35 @@ async function saveProduct() {
   const shadesRaw = document.getElementById('f-shades').value;
   const shades = shadesRaw ? shadesRaw.split(',').map(s => s.trim()).filter(Boolean) : [];
 
+  // parse shade_prices JSON — ถ้าว่างให้ข้ามไม่ส่งไป Supabase
+  let shadePrices = undefined;
+  const spRaw = document.getElementById('f-shade-prices').value.trim();
+  if (spRaw) {
+    try { shadePrices = JSON.parse(spRaw); }
+    catch(e) { showToast('shade_prices JSON ไม่ถูกต้อง เช่น {"30 ml":38,"50 ml":52}', 'error'); return; }
+  }
+
   const payload = {
     name,
-    brand:       document.getElementById('f-brand').value.trim() || 'Skindex',
-    category:    cat,
-    icon:        document.getElementById('f-icon').value.trim() || '📦',
-    price:       price,
-    price_was:   wasVal > 0 ? wasVal : null,
-    stock:       parseInt(document.getElementById('f-stock').value) || 100,
-    img_class:   document.getElementById('f-imgclass').value,
-    badge:       document.getElementById('f-badge').value || null,
-    shades:      shades.length ? shades : ['One size'],
-    description: document.getElementById('f-desc').value.trim(),
-    ingredients: document.getElementById('f-ingr').value.trim(),
-    active:      document.getElementById('f-active').checked,
+    brand:        document.getElementById('f-brand').value.trim() || 'Skindex',
+    category:     cat,
+    icon:         document.getElementById('f-icon').value.trim() || '📦',
+    image_url:    document.getElementById('f-img-url').value || null,
+    price:        price,
+    price_was:    wasVal > 0 ? wasVal : null,
+    stock:        parseInt(document.getElementById('f-stock').value) || 100,
+    img_class:    document.getElementById('f-imgclass').value,
+    badge:        document.getElementById('f-badge').value || null,
+    shades:       shades.length ? shades : ['One size'],
+    description:  document.getElementById('f-desc').value.trim(),
+    ingredients:  document.getElementById('f-ingr').value.trim(),
+    active:       document.getElementById('f-active').checked,
     review_count: 0,
-    rating:      5.0,
+    rating:       5.0,
   };
+
+  // เพิ่ม shade_prices เฉพาะเมื่อมีค่า (ป้องกัน error ถ้า column ยังไม่ได้สร้าง)
+  if (shadePrices !== undefined) payload.shade_prices = shadePrices;
 
   const btn = document.getElementById('btn-save');
   btn.textContent = 'Saving...';

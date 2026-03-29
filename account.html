@@ -196,7 +196,7 @@
   width:52px;height:52px;border-radius:8px;
   background:var(--light);display:flex;align-items:center;
   justify-content:center;font-size:1.5rem;flex-shrink:0;
-  border:1px solid rgba(0,0,0,.05);
+  border:1px solid rgba(0,0,0,.05);overflow:hidden;
 }
 .order-foot{
   display:flex;align-items:center;justify-content:space-between;
@@ -940,7 +940,7 @@ async function loadOrders(userId) {
   try {
     const res = await sb
       .from('orders')
-      .select('*, order_items(qty, unit_price, product_id, products(name, icon))')
+      .select('*, order_items(qty, unit_price, product_id, products(name, icon, image_url))')
       .eq('user_id', userId)
       .order('created_at', { ascending: false });
     orders = res.data;
@@ -970,9 +970,16 @@ async function loadOrders(userId) {
       cancelled:  'status-cancelled',
     }[order.status] || 'status-processing';
 
-    const itemThumbs = (order.order_items || []).map(item =>
-      `<div class="order-item-thumb" title="${item.products?.name || ''}">${item.products?.icon || '📦'}</div>`
-    ).join('');
+    const itemThumbs = (order.order_items || []).map(item => {
+      const imgUrl = item.products?.image_url;
+      const icon   = item.products?.icon || '📦';
+      const name   = item.products?.name || '';
+      return `<div class="order-item-thumb" title="${name}" style="${imgUrl?'padding:0;overflow:hidden':''}">
+        ${imgUrl
+          ? `<img src="${imgUrl}" alt="${name}" style="width:100%;height:100%;object-fit:cover;border-radius:8px">`
+          : icon}
+      </div>`;
+    }).join('');
 
     const date = new Date(order.created_at).toLocaleDateString('en-GB', {
       day:'numeric', month:'short', year:'numeric'
