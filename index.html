@@ -5,7 +5,7 @@
   <link rel="icon" type="image/svg+xml" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAzMiAzMiI+CiAgPHJlY3Qgd2lkdGg9IjMyIiBoZWlnaHQ9IjMyIiByeD0iOCIgZmlsbD0iI0U4NjA0QSIvPgogIDx0ZXh0IHg9IjE2IiB5PSIyMyIgZm9udC1mYW1pbHk9Ikdlb3JnaWEsc2VyaWYiIGZvbnQtc2l6ZT0iMjIiIGZvbnQtd2VpZ2h0PSI3MDAiCiAgICB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmaWxsPSJ3aGl0ZSI+UzwvdGV4dD4KPC9zdmc+">
   <link rel="shortcut icon" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAzMiAzMiI+CiAgPHJlY3Qgd2lkdGg9IjMyIiBoZWlnaHQ9IjMyIiByeD0iOCIgZmlsbD0iI0U4NjA0QSIvPgogIDx0ZXh0IHg9IjE2IiB5PSIyMyIgZm9udC1mYW1pbHk9Ikdlb3JnaWEsc2VyaWYiIGZvbnQtc2l6ZT0iMjIiIGZvbnQtd2VpZ2h0PSI3MDAiCiAgICB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmaWxsPSJ3aGl0ZSI+UzwvdGV4dD4KPC9zdmc+">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Skindex - Beauty & Skincare</title>
+<title>Skindex — Beauty & Skincare</title>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400;1,600&family=DM+Sans:wght@300;400;500;600&display=swap">
 <link rel="stylesheet" href="shared.css">
@@ -82,23 +82,56 @@
 
 /* ── FEATURED ── */
 .featured{padding:3.5rem 3rem;background:white}
-.product-img{height:260px; display:flex;align-items:flex-end;justify-content:center;position:relative;padding:1.5rem}
+.product-img{height:200px;display:flex;align-items:center;justify-content:center;position:relative;overflow:hidden}
 .feat-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:2rem}
 .feat-link{font-size:.8rem;font-weight:600;color:var(--coral);text-decoration:none;letter-spacing:.05em;text-transform:uppercase}
 .feat-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:1.5rem;align-items:stretch}
 .feat-hero-card{
-  background:var(--pink);border-radius:var(--r-lg);
-  display:flex;flex-direction:column;overflow:hidden;
-  cursor:pointer;transition:transform .25s;height:100%;
+  border-radius:var(--r-lg);overflow:hidden;
+  cursor:pointer;transition:transform .25s,box-shadow .25s;
+  position:relative;background:var(--light);
 }
-.feat-hero-card:hover{transform:translateY(-4px)}
-.feat-hero-content{padding:1.5rem 1.5rem 1rem;flex-shrink:0}
+.feat-hero-card:hover{transform:translateY(-4px);box-shadow:0 16px 40px rgba(0,0,0,.12)}
+.feat-hero-content{
+  position:absolute;bottom:0;left:0;right:0;z-index:2;
+  padding:1.25rem;
+  background:linear-gradient(to top,rgba(255,255,255,.95) 60%,transparent 100%);
+}
 .feat-hero-emoji{display:none}
-.feat-hero-badge{font-size:.7rem;font-weight:700;color:var(--coral);letter-spacing:.1em;text-transform:uppercase;margin-bottom:.5rem}
-.feat-hero-title{font-family:'Playfair Display',serif;font-size:1.3rem;font-weight:600;color:var(--dark);margin-bottom:1rem;line-height:1.3}
-.feat-hero-img{flex:1;overflow:hidden;min-height:260px;margin:0;line-height:0}
-.feat-hero-img img{width:100%;height:100%;object-fit:cover;display:block;vertical-align:bottom}
-.feat-products{display:flex;flex-direction:column;gap:1.5rem;height:100%}
+.feat-hero-badge{font-size:.65rem;font-weight:700;color:var(--coral);letter-spacing:.1em;text-transform:uppercase;margin-bottom:.3rem}
+.feat-hero-title{font-family:'Playfair Display',serif;font-size:1.05rem;font-weight:700;color:var(--dark);margin-bottom:.6rem;line-height:1.3}
+.feat-hero-img{width:100%;aspect-ratio:3/4;overflow:hidden}
+.feat-hero-img img{width:100%;height:100%;object-fit:cover;display:block;transition:transform .4s}
+.feat-hero-card:hover .feat-hero-img img{transform:scale(1.04)}
+
+/* portrait card สำหรับ card กลาง + ขวา */
+.feat-prod-card{
+  border-radius:var(--r-lg);overflow:hidden;
+  cursor:pointer;transition:transform .25s,box-shadow .25s;
+  position:relative;background:var(--light);
+}
+.feat-prod-card:hover{transform:translateY(-4px);box-shadow:0 16px 40px rgba(0,0,0,.12)}
+.feat-prod-img{width:100%;aspect-ratio:3/4;overflow:hidden}
+.feat-prod-img img{width:100%;height:100%;object-fit:cover;display:block;transition:transform .4s}
+.feat-prod-card:hover .feat-prod-img img{transform:scale(1.04)}
+.feat-prod-info{
+  position:absolute;bottom:0;left:0;right:0;
+  padding:1rem 1.1rem 1.1rem;
+  background:linear-gradient(to top,rgba(255,255,255,.95) 60%,transparent 100%);
+}
+.feat-prod-name{font-size:.88rem;font-weight:700;color:var(--dark);margin-bottom:.2rem}
+.feat-prod-price .was{font-size:.75rem;color:var(--muted);text-decoration:line-through;margin-right:.3rem}
+.feat-prod-price{font-size:.85rem;font-weight:700;color:var(--dark)}
+.feat-save-badge{
+  position:absolute;top:.75rem;left:.75rem;z-index:3;
+  background:var(--coral);color:white;border-radius:50%;
+  width:46px;height:46px;display:flex;flex-direction:column;
+  align-items:center;justify-content:center;
+  font-size:.58rem;font-weight:700;line-height:1.3;
+  box-shadow:0 4px 12px rgba(232,96,74,.4);
+}
+.feat-save-badge .amt{font-size:.82rem;font-weight:800;line-height:1}
+.feat-products{display:flex;flex-direction:column}
 
 /* ── NEWSLETTER ── */
 .newsletter{padding:4rem 3rem;background:linear-gradient(135deg,var(--lavender) 0%,var(--pink) 100%);text-align:center}
@@ -272,41 +305,38 @@
   </div>
   <div class="feat-grid">
     <div class="feat-hero-card reveal d1" onclick="window.location='shop.html'">
-      <div class="feat-hero-content">
-        <div class="feat-hero-badge">✦ Customer Favorite</div>
-        <div class="feat-hero-title">Antioxidants PM Facial Oil</div>
-        <button class="btn-coral" style="width:fit-content;font-size:.78rem;padding:.6rem 1.4rem"
-          onclick="event.stopPropagation();window.location='shop.html'">SHOP NOW</button>
-      </div>
+      <div class="feat-save-badge" style="background:#1C1C2E"><span style="font-size:.55rem">Top</span><span class="amt">Pick</span></div>
       <div class="feat-hero-img">
         <img src="./photo/Minimalist Skincare Display.png" alt="Customer Favorite">
       </div>
+      <div class="feat-hero-content">
+        <div class="feat-hero-badge">✦ Customer Favorite</div>
+        <div class="feat-hero-title">Antioxidants PM Facial Oil</div>
+        <button class="btn-coral" style="width:fit-content;font-size:.75rem;padding:.5rem 1.2rem"
+          onclick="event.stopPropagation();window.location='shop.html'">SHOP NOW</button>
+      </div>
     </div>
     <div class="feat-products">
-      <div class="product-card reveal d2" style="flex:1;display:flex;flex-direction:column" onclick="window.location='product.html?id=0'">
-        <div class="product-img" style="padding:0;overflow:hidden">
-          <div class="product-badge badge-new">New</div>
-          <img src="./photo/Minimalist Spa Setup.png" alt="Skindex Cream Blush" style="width:100%;height:100%;object-fit:cover">
+      <div class="feat-prod-card reveal d2" onclick="window.location='product.html?id=1'">
+        <div class="feat-save-badge"><span>New</span></div>
+        <div class="feat-prod-img">
+          <img src="./photo/Barrier Repair Serum.png" alt="Barrier Repair Serum">
         </div>
-        <div class="product-info">
-          <div class="product-name">Skindex Spa Set</div>
-          <div class="product-stars">★★★★★ <span>2,687 reviews</span></div>
-          <div class="product-price"><span class="price-old">$39.00</span><span class="price-new">$29.00</span></div>
-          <button class="btn-add" onclick="event.stopPropagation();Cart.add(0,'30 ml');showAddedFeedback(this)">Add to Bag</button>
+        <div class="feat-prod-info">
+          <div class="feat-prod-name">Barrier Repair Serum</div>
+          <div class="feat-prod-price"><span class="was">$48.00</span>$38.00</div>
         </div>
       </div>
     </div>
     <div class="feat-products">
-      <div class="product-card reveal d3" style="flex:1;display:flex;flex-direction:column" onclick="window.location='product.html?id=2'">
-        <div class="product-img" style="padding:0;overflow:hidden">
-          <div class="product-badge badge-hot">Hot</div>
-          <img src="./photo/Minimalist Cosmetic Display.png" alt="Holy Grail Cream" style="width:100%;height:100%;object-fit:cover">
+      <div class="feat-prod-card reveal d3" onclick="window.location='product.html?id=8'">
+        <div class="feat-save-badge"><span style="font-size:.55rem">Save</span><span class="amt">$10</span></div>
+        <div class="feat-prod-img">
+          <img src="./photo/mask night.png " alt="Overnight Recovery Mask">
         </div>
-        <div class="product-info">
-          <div class="product-name">Holy Grail Cream</div>
-          <div class="product-stars">★★★★★ <span>4,287 reviews</span></div>
-          <div class="product-price"><span class="price-old">$39.00</span><span class="price-new">$29.00</span></div>
-          <button class="btn-add" onclick="event.stopPropagation();Cart.add(2,'30 ml');showAddedFeedback(this)">Choose Color</button>
+        <div class="feat-prod-info">
+          <div class="feat-prod-name">Overnight Recovery Mask</div>
+          <div class="feat-prod-price"><span class="was">$52.00</span>$48.00</div>
         </div>
       </div>
     </div>

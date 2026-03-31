@@ -220,7 +220,6 @@
     if(!p){
       document.querySelector('.product-wrap').innerHTML =
         `<div style="text-align:center;padding:5rem 2rem">
-           <div style="font-size:3rem">😕</div>
            <h2 style="font-family:'Playfair Display',serif;margin:1rem 0 .5rem">ไม่พบสินค้า</h2>
            <a href="shop.html"><button class="btn-coral">← กลับไปหน้าร้าน</button></a>
          </div>`;
@@ -247,22 +246,18 @@
     } else { document.getElementById('pBadge').innerHTML=''; }
 
     // gallery
-    const bg = p.imgClass.includes('pink')?'#FFE4E8':p.imgClass.includes('butter')?'#FFF0D0':p.imgClass.includes('sage')?'#E0F0D8':'#EAE0F8';
+    const bg = (p.imgClass||'').includes('pink')?'#FFE4E8':(p.imgClass||'').includes('butter')?'#FFF0D0':(p.imgClass||'').includes('sage')?'#E0F0D8':'#EAE0F8';
     if(p.image_url){
       document.getElementById('galMain').innerHTML =
         `<img src="${p.image_url}" alt="${p.name}" style="width:100%;height:100%;object-fit:cover;border-radius:var(--r-lg)">`;
       document.getElementById('galThumbs').innerHTML =
         `<div class="thumb active" onclick="setThumbImg(this,'${p.image_url}')" style="background:${bg};overflow:hidden;padding:0">
            <img src="${p.image_url}" alt="" style="width:100%;height:100%;object-fit:cover;border-radius:8px">
-         </div>
-         <div class="thumb" onclick="setThumb(this,'🌿')" style="background:${bg}">🌿</div>
-         <div class="thumb" onclick="setThumb(this,'✨')" style="background:${bg}">✨</div>`;
+         </div>`;
     } else {
-      const icons = [p.icon,'🌿','✨'];
       document.getElementById('galMain').innerHTML = `<span style="font-size:9rem">${p.icon}</span>`;
-      document.getElementById('galThumbs').innerHTML = icons.map((ic,i)=>
-        `<div class="thumb${i===0?' active':''}" onclick="setThumb(this,'${ic}')" style="background:${bg}">${ic}</div>`
-      ).join('');
+      document.getElementById('galThumbs').innerHTML =
+        `<div class="thumb active" onclick="setThumb(this,'${p.icon}')" style="background:${bg}">${p.icon}</div>`;
     }
 
     // shades + ราคาแต่ละ size
@@ -366,7 +361,7 @@
     toastT = setTimeout(()=>el.classList.remove('show'), 2400);
   }
 
-  // รอ Supabase โหลดก่อนเสมอ
+  // รอ Supabase โหลด
   const pid = new URLSearchParams(location.search).get('id');
   onProductsReady(function(){ loadProduct(pid); });
 </script>
